@@ -1,7 +1,9 @@
-function HomePage () {
+import HeroSection from "../components/HeroSection";
+
+function HomePage() {
     return (
         <>
-        <h1>HomePage BoolZip</h1>
+            <HeroSection />
         </>
     )
 }
