@@ -137,3 +137,17 @@ body {
         font-size: clamp(2rem, 13vw, 3rem);
     }
 }
+
+.custom-navbar {
+    height: 70px;
+    overflow: hidden;
+}
+
+.header-logo {
+    height: 90px;
+    width: auto;
+    display: block;
+    transform: scale(1.6);
+    transform-origin: center;
+}
+
