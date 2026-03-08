@@ -4,9 +4,10 @@ function HeroSection() {
     return (
         <section className="hero" aria-labelledby="hero-title">
             <div className="hero__content">
-                <p className="hero__tag">BoolZip 2026</p>
+                
                 <h1 id="hero-title" className="hero__title">
-                    Accendini iconici, stile deciso.
+                    <span>Accendini iconici,</span>
+                    <span>stile deciso.</span>
                 </h1>
                 <p className="hero__text">
                     Design metallico, apertura precisa e finiture premium per uso quotidiano o collezione.
@@ -16,9 +17,9 @@ function HeroSection() {
                     <Link className="hero__btn hero__btn--primary" to="/products/1">
                         Vai al prodotto
                     </Link>
-                    <a className="hero__btn hero__btn--outline" href="#collezione">
+                    {/*<a className="hero__btn hero__btn--outline" href="#collezione">
                         Guarda collezione
-                    </a>
+                    </a>*/}
                 </div>
             </div>
         </section>
