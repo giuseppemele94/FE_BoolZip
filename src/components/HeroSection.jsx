@@ -15,7 +15,7 @@ function HeroSection() {
 
                 <div className="hero__actions">
                     <Link className="hero__btn hero__btn--primary" to="/products/1">
-                        Vai al prodotto
+                        Vai ai prodotti
                     </Link>
                     {/*<a className="hero__btn hero__btn--outline" href="#collezione">
                         Guarda collezione
