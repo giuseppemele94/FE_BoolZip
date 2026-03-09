@@ -1,12 +1,12 @@
 import HeroSection from "../components/HeroSection";
-import ProductGrid from "../components/ProductGrid";
+import ProductList from "../components/ProductList";
 
 function HomePage({ products }) {
     return (
         <>
             <HeroSection />
             {/* Passaggio 3: in home passo i prodotti via props al componente card. */}
-            <ProductGrid
+            <ProductList
                 products={products}
                 eyebrow="Selezione"
                 title="Prodotti in evidenza"
