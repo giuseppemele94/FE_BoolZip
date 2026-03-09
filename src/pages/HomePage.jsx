@@ -9,7 +9,7 @@ function HomePage({ products }) {
             <ProductList
                 products={products}
                 eyebrow="Selezione"
-                title="Prodotti in evidenza"
+                title="Prodotti più venduti"
                 limit={3}
             />
         </>
