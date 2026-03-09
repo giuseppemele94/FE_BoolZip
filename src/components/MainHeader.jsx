@@ -1,8 +1,23 @@
 import { Link, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function MainHeader() {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
     return (
-        <header className="site-header">
+        <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
             <div className="site-header__inner">
                 <Link to="/" className="site-header__brand">
                     <img
