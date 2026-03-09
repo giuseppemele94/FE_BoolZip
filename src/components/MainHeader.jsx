@@ -16,7 +16,7 @@ function MainHeader() {
                     <NavLink to="/" className="site-header__link">
                         Home
                     </NavLink>
-                    <NavLink to="/products/1" className="site-header__link">
+                    <NavLink to="/products" className="site-header__link">
                         Prodotti
                     </NavLink>
                     <NavLink to="/storia" className="site-header__link">
