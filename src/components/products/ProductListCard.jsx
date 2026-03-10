@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 
 function ProductListCard({ product }) {
-    const { slug, name, description, price, image } = product
+    const { slug, name, description, price, image_url } = product
     return (
         <article className="catalog-card">
             <Link to={`/products/${slug}`} className="catalog-card-link">
                 <img
-                    src={image}
+                    src={`${image_url}`}
                     alt={name}
                     className="catalog-card__img"
                 />
