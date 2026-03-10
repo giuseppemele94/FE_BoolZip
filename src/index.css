@@ -667,11 +667,13 @@ body {
 .product-main-image {
     margin: 0;
     border: 1px solid #dcdfe5;
-    background: #fff;
+    background: transparent;
 }
 
 .product-main-image img {
+    display: block;
     height: min(580px, 60vh);
+    background: transparent;
 }
 
 .product-thumbs {
