@@ -6,6 +6,7 @@ const buildPlaceholder = (sku, view) =>
 export const mockProducts = [
     {
         id: '1935-25',
+        slug: '1935-25',
         name: '1935.25 Replica Senza Tacche',
         sku: '1935.25',
         price: 64,
@@ -30,6 +31,7 @@ export const mockProducts = [
     },
     {
         id: 'armor-steel',
+        slug: 'armor-steel',
         name: 'Armor Brushed Steel',
         sku: 'A-4812',
         price: 72,
@@ -47,6 +49,7 @@ export const mockProducts = [
     },
     {
         id: 'slim-chrome',
+        slug: 'slim-chrome',
         name: 'Slim Satin Chrome',
         sku: 'SL-2280',
         price: 54,
@@ -64,6 +67,7 @@ export const mockProducts = [
     },
     {
         id: 'street-brass',
+        slug: 'street-brass',
         name: 'Street Brass Edition',
         sku: 'S-9011',
         price: 59,
@@ -81,6 +85,7 @@ export const mockProducts = [
     },
     {
         id: 'vintage-black',
+        slug: 'vintage-black',
         name: 'Vintage Black Crackle',
         sku: 'V-1941',
         price: 67,

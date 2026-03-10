@@ -5,13 +5,25 @@ function ProductInfoPanel({
     onIncrease,
     outOfStock,
 }) {
+    // Prezzo in formato italiano: 64,00
+    const numericPrice = Number(product.price);
+    const formattedPrice = Number.isFinite(numericPrice)
+        ? new Intl.NumberFormat('it-IT', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(numericPrice)
+        : '0,00';
+
+    const productFeatures = Array.isArray(product.features) ? product.features : [];
+
     return (
         <div className="product-info">
+            {/* Titolo e riferimenti prodotto */}
             <h1>{product.name}</h1>
             <p className="product-sku">SKU: {product.sku}</p>
 
             <div className="product-price-row">
-                <strong>EUR {product.price.toFixed(2)}</strong>
+                <strong>EUR {formattedPrice}</strong>
                 <span className={`stock-pill ${outOfStock ? 'is-out' : 'is-in'}`}>
                     {outOfStock ? 'Esaurito' : `${product.stock} disponibili`}
                 </span>
@@ -42,10 +54,11 @@ function ProductInfoPanel({
                 <i className="bi bi-share"></i> Condividi
             </button>
 
+            {/* Contenuti editoriali */}
             <p className="product-description">{product.description}</p>
 
             <ul className="product-features">
-                {product.features.map((feature) => (
+                {productFeatures.map((feature) => (
                     <li key={feature}>{feature}</li>
                 ))}
             </ul>
