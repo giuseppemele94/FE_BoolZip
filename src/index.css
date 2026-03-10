@@ -527,6 +527,11 @@ body {
     background: #f6f7f9;
 }
 
+.catalog-card__img,
+.related-card img {
+    background: transparent;
+}
+
 .catalog-card__img {
     height: 220px;
 }
