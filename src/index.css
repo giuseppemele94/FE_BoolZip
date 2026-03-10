@@ -61,8 +61,21 @@ body {
         width: min(1800px, 95%);
         min-height: 650px;
     }
-    .catalog{
-        width: min(1800px, 84%) !important; 
+
+    .catalog {
+        width: min(1800px, 84%) !important;
+    }
+}
+
+@media (min-width: 1921px) {
+
+    .hero,
+    .catalog {
+        width: min(1800px, 92%) !important;
+    }
+
+    .hero {
+        max-width: none;
     }
 }
 
