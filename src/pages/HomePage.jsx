@@ -1,17 +1,11 @@
 import HeroSection from "../components/HeroSection";
-import ProductList from "../components/ProductList";
+import BestSellerSection from "../components/BestSellerSection";
 
 function HomePage({ products }) {
     return (
         <>
             <HeroSection />
-            {/* Passaggio 3: in home passo i prodotti via props al componente card. */}
-            <ProductList
-                products={products}
-                eyebrow="Selezione"
-                title="Prodotti più venduti"
-                limit={3}
-            />
+            <BestSellerSection products={products} limit={4} />
         </>
     )
 }

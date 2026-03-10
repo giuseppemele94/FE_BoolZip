@@ -17,17 +17,40 @@ function ProductInfoPanel({
     const productFeatures = Array.isArray(product.features) ? product.features : [];
     const productMaterials = Array.isArray(product.materials) ? product.materials : [];
     const productSizes = Array.isArray(product.sizes) ? product.sizes : [];
+    const rawCategories =
+        product.categories ??
+        product.category ??
+        product.categorie ??
+        product.categoria;
+
+    const productCategories = Array.isArray(rawCategories)
+        ? rawCategories
+            .map((item) => (typeof item === 'string' ? item : item?.name || item?.label || ''))
+            .map((item) => String(item).trim())
+            .filter(Boolean)
+        : typeof rawCategories === 'string'
+            ? rawCategories
+                .split(/[,;|]/)
+                .map((item) => item.trim())
+                .filter(Boolean)
+            : [];
+
+    const hasStockValue = Number.isFinite(Number(product.stock));
+    const stockLabel = outOfStock
+        ? 'Esaurito'
+        : hasStockValue
+            ? `${Number(product.stock)} disponibili`
+            : 'Disponibile';
 
     return (
         <div className="product-info">
-            {/* Titolo e riferimenti prodotto */}
+            {/* Titolo prodotto: nessun ID/SKU visibile in pagina dettaglio. */}
             <h1>{product.name}</h1>
-            <p className="product-sku">SKU: {product.sku}</p>
 
             <div className="product-price-row">
                 <strong>EUR {formattedPrice}</strong>
                 <span className={`stock-pill ${outOfStock ? 'is-out' : 'is-in'}`}>
-                    {outOfStock ? 'Esaurito' : `${product.stock} disponibili`}
+                    {stockLabel}
                 </span>
             </div>
 
@@ -76,6 +99,17 @@ function ProductInfoPanel({
                     <ul className="product-features">
                         {productSizes.map((size) => (
                             <li key={size}>{size}</li>
+                        ))}
+                    </ul>
+                </>
+            )}
+
+            {productCategories.length > 0 && (
+                <>
+                    <p className="product-tax-note">Categoria</p>
+                    <ul className="product-features">
+                        {productCategories.map((category) => (
+                            <li key={category}>{category}</li>
                         ))}
                     </ul>
                 </>
