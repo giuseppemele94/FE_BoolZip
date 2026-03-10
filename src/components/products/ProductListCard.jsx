@@ -1,22 +1,23 @@
 import { Link } from 'react-router-dom';
 
 function ProductListCard({ product }) {
+    const { slug, name, description, price, image } = product
     return (
         <article className="catalog-card">
-            <Link to={`/products/${product.id}`} className="catalog-card-link">
+            <Link to={`/products/${slug}`} className="catalog-card-link">
                 <img
-                    src={product.images[0]}
-                    alt={product.name}
+                    src={image}
+                    alt={name}
                     className="catalog-card__img"
                 />
 
                 <div className="catalog-card__body">
-                    <p className="catalog-card__sku">SKU: {product.sku}</p>
-                    <h3>{product.name}</h3>
-                    <p className="catalog-card__desc">{product.shortDescription}</p>
+
+                    <h3>{name}</h3>
+                    <p className="catalog-card__desc">{description}</p>
 
                     <div className="catalog-card__bottom">
-                        <span>EUR {product.price.toFixed(2)}</span>
+                        <span>EUR {price}</span>
                     </div>
                 </div>
             </Link>
