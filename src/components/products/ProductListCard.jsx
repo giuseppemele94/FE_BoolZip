@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 
 function ProductListCard({ product }) {
-    const { slug, name, description, price, image, image_url } = product
-    const cardImage = image_url || image;
+    const { slug, name, description, price, image_url } = product
+    const cardImage = image_url;
     const numericPrice = Number(price);
     const formattedPrice = Number.isFinite(numericPrice)
         ? new Intl.NumberFormat('it-IT', {
