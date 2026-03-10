@@ -1,12 +1,16 @@
 function ProductGallery({ product, activeImage, onSelectImage }) {
+    // Mantengo sempre un'immagine principale valida.
+    const images = Array.isArray(product.images) ? product.images : [];
+    const mainImage = activeImage || images[0] || '';
+
     return (
         <div className="product-gallery">
             <figure className="product-main-image">
-                <img src={activeImage || product.images[0]} alt={product.name} />
+                <img src={mainImage} alt={product.name} />
             </figure>
 
             <div className="product-thumbs" aria-label="Miniature prodotto">
-                {product.images.map((img, index) => (
+                {images.map((img, index) => (
                     <button
                         key={img}
                         type="button"

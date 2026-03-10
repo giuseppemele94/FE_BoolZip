@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 
 function ProductListCard({ product }) {
-    const { slug, name, description, price, image_url } = product
-    const cardImage = image_url;
+    const { id, slug, name, price, image_url, image, images } = product;
+    const productSlug = slug || id;
+    const cardImage = image_url || image || (Array.isArray(images) ? images[0] : '');
     const numericPrice = Number(price);
     const formattedPrice = Number.isFinite(numericPrice)
         ? new Intl.NumberFormat('it-IT', {
@@ -13,7 +14,7 @@ function ProductListCard({ product }) {
 
     return (
         <article className="catalog-card">
-            <Link to={`/products/${slug}`} className="catalog-card-link">
+            <Link to={`/products/${productSlug}`} className="catalog-card-link">
                 <img
                     src={cardImage}
                     alt={name}
@@ -23,10 +24,9 @@ function ProductListCard({ product }) {
                 <div className="catalog-card__body">
 
                     <h3>{name}</h3>
-                    <p className="catalog-card__desc">{description}</p>
 
                     <div className="catalog-card__bottom">
-                        <span>EUR {formattedPrice}</span>
+                        <span className="catalog-card__price">€ {formattedPrice}</span>
                     </div>
                 </div>
             </Link>

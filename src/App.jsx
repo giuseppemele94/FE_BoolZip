@@ -20,8 +20,8 @@ function App() {
             <Route index element={<HomePage products={mockProducts} />} />
             {/* Pagina prodotti: mostra il listato card, non il dettaglio singolo. */}
             <Route path="/products" element={<ProductsPage products={mockProducts} />} />
-            {/* Passaggio 4: rotta dinamica modello, pronta per id prodotto da backend. */}
-            <Route path="/products/:id" element={<ProductDetailPage products={mockProducts} />} />
+            {/* Passaggio 4: rotta dinamica modello tramite slug. */}
+            <Route path="/products/:slug" element={<ProductDetailPage products={mockProducts} />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

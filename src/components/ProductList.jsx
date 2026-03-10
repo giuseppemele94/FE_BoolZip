@@ -1,4 +1,4 @@
-import ProductListCard from "./products/ProductListCard"; 
+import ProductListCard from "./products/ProductListCard";
 
 function ProductList({ products, eyebrow, title }) {
     return (
@@ -10,7 +10,7 @@ function ProductList({ products, eyebrow, title }) {
 
             <div className="catalog__grid">
                 {products.map((product) => (
-                    <ProductListCard key={product.slug} product={product} />
+                    <ProductListCard key={product.slug || product.id} product={product} />
                 ))}
             </div>
         </section>

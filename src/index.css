@@ -515,6 +515,12 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.catalog-card:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 18px rgba(31, 36, 48, 0.12);
 }
 
 .catalog-card__img,
@@ -534,6 +540,11 @@ body {
 
 .catalog-card__img {
     height: 220px;
+    transition: transform 0.22s ease;
+}
+
+.catalog-card:hover .catalog-card__img {
+    transform: scale(1.03);
 }
 
 .catalog-card__body,
@@ -597,7 +608,13 @@ body {
     margin-top: auto;
 }
 
-.catalog-card__bottom span,
+.catalog-card__price {
+    font-family: "Open Sans", sans-serif;
+    font-size: 0.93rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
 .related-card__body p {
     font-weight: 700;
 }
