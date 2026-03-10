@@ -162,18 +162,8 @@ function ProductDetailPage({ products = [] }) {
         [slug, allProducts]
     );
 
-    const [activeImage, setActiveImage] = useState('');
-    const [quantity, setQuantity] = useState(1);
-
-    // 5) Quando cambia prodotto resetto stato locale della pagina.
-    useEffect(() => {
-        if (!normalizedProduct) {
-            return;
-        }
-
-        setActiveImage(normalizedProduct.images[0] || '');
-        setQuantity(1);
-    }, [normalizedProduct]);
+    const [activeImageByProduct, setActiveImageByProduct] = useState({});
+    const [quantityByProduct, setQuantityByProduct] = useState({});
 
     // 6) Stato di loading: evito "not found" durante la chiamata API.
     if (isLoading && !normalizedProduct) {
@@ -199,6 +189,17 @@ function ProductDetailPage({ products = [] }) {
 
     // 8) Correlati e stato disponibilita.
     const currentProductKey = String(normalizedProduct.slug || normalizedProduct.id);
+    const activeImage =
+        activeImageByProduct[currentProductKey] || normalizedProduct.images[0] || '';
+    const quantity = quantityByProduct[currentProductKey] ?? 1;
+
+    const handleSelectImage = (image) => {
+        setActiveImageByProduct((current) => ({
+            ...current,
+            [currentProductKey]: image,
+        }));
+    };
+
     const normalizedApiProducts = apiProducts
         .map(normalizeProduct)
         .filter(Boolean);
@@ -234,8 +235,27 @@ function ProductDetailPage({ products = [] }) {
 
     const outOfStock = normalizedProduct.stock === 0;
 
-    const decrement = () => setQuantity((current) => Math.max(1, current - 1));
-    const increment = () => setQuantity((current) => Math.min(10, current + 1));
+    const decrement = () => {
+        setQuantityByProduct((current) => {
+            const currentQuantity = current[currentProductKey] ?? 1;
+
+            return {
+                ...current,
+                [currentProductKey]: Math.max(1, currentQuantity - 1),
+            };
+        });
+    };
+
+    const increment = () => {
+        setQuantityByProduct((current) => {
+            const currentQuantity = current[currentProductKey] ?? 1;
+
+            return {
+                ...current,
+                [currentProductKey]: Math.min(10, currentQuantity + 1),
+            };
+        });
+    };
 
     // 9) Render pagina dettaglio.
     return (
@@ -244,7 +264,7 @@ function ProductDetailPage({ products = [] }) {
                 <ProductGallery
                     product={normalizedProduct}
                     activeImage={activeImage}
-                    onSelectImage={setActiveImage}
+                    onSelectImage={handleSelectImage}
                 />
 
                 <ProductInfoPanel
