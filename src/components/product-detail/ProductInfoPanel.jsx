@@ -15,6 +15,8 @@ function ProductInfoPanel({
         : '0,00';
 
     const productFeatures = Array.isArray(product.features) ? product.features : [];
+    const productMaterials = Array.isArray(product.materials) ? product.materials : [];
+    const productSizes = Array.isArray(product.sizes) ? product.sizes : [];
 
     return (
         <div className="product-info">
@@ -56,6 +58,28 @@ function ProductInfoPanel({
 
             {/* Contenuti editoriali */}
             <p className="product-description">{product.description}</p>
+
+            {productMaterials.length > 0 && (
+                <>
+                    <p className="product-tax-note">Materiali</p>
+                    <ul className="product-features">
+                        {productMaterials.map((material) => (
+                            <li key={material}>{material}</li>
+                        ))}
+                    </ul>
+                </>
+            )}
+
+            {productSizes.length > 0 && (
+                <>
+                    <p className="product-tax-note">Size</p>
+                    <ul className="product-features">
+                        {productSizes.map((size) => (
+                            <li key={size}>{size}</li>
+                        ))}
+                    </ul>
+                </>
+            )}
 
             <ul className="product-features">
                 {productFeatures.map((feature) => (

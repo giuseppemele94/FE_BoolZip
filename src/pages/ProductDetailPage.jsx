@@ -18,6 +18,54 @@ function getProductImages(product) {
     return fallbackImage ? [fallbackImage] : [];
 }
 
+function getProductMaterials(product) {
+    const rawMaterials =
+        product.materials ??
+        product.material ??
+        product.materiali ??
+        product.materiale;
+
+    if (Array.isArray(rawMaterials)) {
+        return rawMaterials
+            .map((item) => (typeof item === 'string' ? item : item?.name || item?.label || ''))
+            .map((item) => String(item).trim())
+            .filter(Boolean);
+    }
+
+    if (typeof rawMaterials === 'string') {
+        return rawMaterials
+            .split(/[,;|]/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
+function getProductSizes(product) {
+    const rawSizes =
+        product.sizes ??
+        product.size ??
+        product.taglie ??
+        product.taglia;
+
+    if (Array.isArray(rawSizes)) {
+        return rawSizes
+            .map((item) => (typeof item === 'string' ? item : item?.name || item?.label || ''))
+            .map((item) => String(item).trim())
+            .filter(Boolean);
+    }
+
+    if (typeof rawSizes === 'string') {
+        return rawSizes
+            .split(/[,;|]/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
 function normalizeProduct(product) {
     if (!product) {
         return null;
@@ -28,6 +76,8 @@ function normalizeProduct(product) {
         id: product.id ?? product.slug,
         slug: String(product.slug ?? product.id ?? ''),
         images: getProductImages(product),
+        materials: getProductMaterials(product),
+        sizes: getProductSizes(product),
         relatedIds: Array.isArray(product.relatedIds) ? product.relatedIds : [],
         features: Array.isArray(product.features) ? product.features : [],
     };
