@@ -61,6 +61,9 @@ body {
         width: min(1800px, 95%);
         min-height: 650px;
     }
+    .catalog{
+        width: min(1800px, 84%) !important; 
+    }
 }
 
 @media (max-width: 768px) {
@@ -447,7 +450,7 @@ body {
 /* Catalogo demo home */
 .catalog,
 .product-page {
-    width: min(1280px, 92%);
+    width: min(1700px, 92%);
 }
 
 .catalog {
