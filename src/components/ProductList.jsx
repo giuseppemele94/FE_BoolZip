@@ -33,14 +33,6 @@ function toInputPrice(value) {
     return String(Number(value.toFixed(2)));
 }
 
-function toQuickSearchLabel(value) {
-    if (!value) {
-        return "";
-    }
-
-    return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 function ProductList({ products, eyebrow, title, description, limit, showFilters = false }) {
     // Difesa base: se products non e un array uso lista vuota.
     const safeProducts = Array.isArray(products) ? products : [];
@@ -56,6 +48,8 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
     const [selectedMaterial, setSelectedMaterial] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
+    // Gestisce apertura/chiusura del pannello filtri laterale.
+    const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
     // Normalizzo la ricerca per confronto case-insensitive.
     const normalizedSearch = searchTerm.trim().toLowerCase();
     const hasPriceFilter = minPrice !== "" || maxPrice !== "";
@@ -122,34 +116,6 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
                 max,
             },
         ];
-    }, [visibleProducts]);
-
-    const quickSearchSuggestions = useMemo(() => {
-        // Costruisco ricerche rapide partendo dai termini piu ricorrenti nei nomi prodotto.
-        const stopWords = new Set(["zippo", "classic", "slim", "replica"]);
-        const tokenCountMap = new Map();
-
-        visibleProducts.forEach((product) => {
-            const productName = String(product?.name || "");
-            const tokens = productName
-                .toLowerCase()
-                .split(/[^a-z0-9]+/)
-                .filter((token) => token.length >= 3 && !stopWords.has(token));
-
-            tokens.forEach((token) => {
-                tokenCountMap.set(token, (tokenCountMap.get(token) || 0) + 1);
-            });
-        });
-
-        const rankedTokens = [...tokenCountMap.entries()]
-            .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-            .slice(0, 6)
-            .map(([token]) => ({
-                value: token,
-                label: toQuickSearchLabel(token),
-            }));
-
-        return rankedTokens;
     }, [visibleProducts]);
 
     useEffect(() => {
@@ -233,6 +199,7 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
     }
 
     function applyQuickPriceRange(nextMin, nextMax) {
+        // Collego i bottoni range ai campi prezzo controllati.
         setMinPrice(toInputPrice(nextMin));
         setMaxPrice(toInputPrice(nextMax));
     }
@@ -252,7 +219,6 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
                         <ProductSearchBar
                             value={searchTerm}
                             onChange={setSearchTerm}
-                            quickSuggestions={quickSearchSuggestions}
                             totalCount={visibleProducts.length}
                             visibleCount={filteredProducts.length}
                         />
@@ -262,27 +228,46 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
 
             {showFilters ? (
                 // Layout con sidebar filtri + griglia prodotti.
-                <div className="catalog__layout">
-                    <ProductPriceFilter
-                        minPrice={minPrice}
-                        maxPrice={maxPrice}
-                        selectedMaterial={selectedMaterial}
-                        selectedSize={selectedSize}
-                        selectedCategory={selectedCategory}
-                        materialOptions={filterOptions.materials}
-                        sizeOptions={filterOptions.sizes}
-                        categoryOptions={filterOptions.categories}
-                        onMinPriceChange={setMinPrice}
-                        onMaxPriceChange={setMaxPrice}
-                        quickPriceRanges={quickPriceRanges}
-                        onQuickPriceRange={applyQuickPriceRange}
-                        onMaterialChange={setSelectedMaterial}
-                        onSizeChange={setSelectedSize}
-                        onCategoryChange={setSelectedCategory}
-                        onReset={resetFilters}
-                    />
+                <div className={`catalog__layout ${isFiltersPanelOpen ? "is-filters-open" : ""}`}>
+                    <div
+                        id="catalog-filters-panel"
+                        className="catalog__filters-panel"
+                        aria-hidden={!isFiltersPanelOpen}
+                    >
+                        {/* Sidebar filtri: resta montata e viene mostrata con animazione CSS. */}
+                        <ProductPriceFilter
+                            minPrice={minPrice}
+                            maxPrice={maxPrice}
+                            selectedMaterial={selectedMaterial}
+                            selectedSize={selectedSize}
+                            selectedCategory={selectedCategory}
+                            materialOptions={filterOptions.materials}
+                            sizeOptions={filterOptions.sizes}
+                            categoryOptions={filterOptions.categories}
+                            onMinPriceChange={setMinPrice}
+                            onMaxPriceChange={setMaxPrice}
+                            quickPriceRanges={quickPriceRanges}
+                            onQuickPriceRange={applyQuickPriceRange}
+                            onMaterialChange={setSelectedMaterial}
+                            onSizeChange={setSelectedSize}
+                            onCategoryChange={setSelectedCategory}
+                            onReset={resetFilters}
+                        />
+                    </div>
 
                     <div className="catalog__content">
+                        {/* Pulsante con icona che apre/chiude dinamicamente il pannello filtri. */}
+                        <button
+                            type="button"
+                            className={`catalog__filters-toggle ${isFiltersPanelOpen ? "is-open" : ""}`}
+                            onClick={() => setIsFiltersPanelOpen((currentValue) => !currentValue)}
+                            aria-controls="catalog-filters-panel"
+                            aria-expanded={isFiltersPanelOpen}
+                        >
+                            <i className={`bi ${isFiltersPanelOpen ? "bi-x-lg" : "bi-sliders2"}`} aria-hidden="true"></i>
+                            <span>{isFiltersPanelOpen ? "Chiudi filtri" : "Apri filtri"}</span>
+                        </button>
+
                         {productsToRender.length === 0 ? (
                             // Messaggio mostrato solo quando i filtri non trovano risultati.
                             <p className="catalog__empty">Nessun prodotto trovato con i filtri selezionati.</p>

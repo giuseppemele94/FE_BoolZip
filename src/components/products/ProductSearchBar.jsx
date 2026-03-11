@@ -1,6 +1,4 @@
-function ProductSearchBar({ value, onChange, quickSuggestions = [], totalCount, visibleCount }) {
-    const normalizedValue = value.trim().toLowerCase();
-
+function ProductSearchBar({ value, onChange, totalCount, visibleCount }) {
     return (
         <div className="catalog-controls">
             <label htmlFor="catalog-search" className="catalog-controls__label">
@@ -21,21 +19,6 @@ function ProductSearchBar({ value, onChange, quickSuggestions = [], totalCount, 
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
             />
-
-            {quickSuggestions.length > 0 && (
-                <div className="catalog-controls__quick-list" aria-label="Ricerche rapide">
-                    {quickSuggestions.map((item) => (
-                        <button
-                            key={item.value}
-                            type="button"
-                            className={`catalog-controls__quick-btn ${normalizedValue === item.value ? "is-active" : ""}`}
-                            onClick={() => onChange(item.value)}
-                        >
-                            {item.label}
-                        </button>
-                    ))}
-                </div>
-            )}
 
             {/* Feedback immediato su quanti prodotti restano visibili. */}
             <p className="catalog-controls__meta">
