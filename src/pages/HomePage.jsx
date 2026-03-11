@@ -6,7 +6,7 @@ function HomePage({ products }) {
     return (
         <>
             <HeroSection />
-            <LatestArrivalsSection limit={3} />
+            <LatestArrivalsSection  products={products} limit={3} />
             <BestSellerSection products={products} limit={4} />
         </>
     )
