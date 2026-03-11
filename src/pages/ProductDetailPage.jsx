@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProductGallery from '../components/product-detail/ProductGallery';
@@ -8,13 +8,19 @@ import RelatedProducts from '../components/product-detail/RelatedProducts';
 const API_PRODUCTS_URL = 'http://localhost:3000/api/products';
 
 function getProductImages(product) {
-    const galleryImages = Array.isArray(product.images) ? product.images : [];
+    const rawImages = product?.product_images ?? [];
 
-    if (galleryImages.length > 0) {
-        return galleryImages;
+    if (Array.isArray(rawImages) && rawImages.length > 0) {
+        return rawImages
+            .map((item) =>
+                typeof item === 'string'
+                    ? item
+                    : item?.image_url || item?.url || ''
+            )
+            .filter(Boolean);
     }
 
-    const fallbackImage = product.image_url || product.image;
+    const fallbackImage = product?.image_url || product?.image;
     return fallbackImage ? [fallbackImage] : [];
 }
 
@@ -27,7 +33,11 @@ function getProductMaterials(product) {
 
     if (Array.isArray(rawMaterials)) {
         return rawMaterials
-            .map((item) => (typeof item === 'string' ? item : item?.name || item?.label || ''))
+            .map((item) =>
+                typeof item === 'string'
+                    ? item
+                    : item?.name || item?.label || ''
+            )
             .map((item) => String(item).trim())
             .filter(Boolean);
     }
@@ -51,7 +61,11 @@ function getProductSizes(product) {
 
     if (Array.isArray(rawSizes)) {
         return rawSizes
-            .map((item) => (typeof item === 'string' ? item : item?.name || item?.label || ''))
+            .map((item) =>
+                typeof item === 'string'
+                    ? item
+                    : item?.name || item?.label || ''
+            )
             .map((item) => String(item).trim())
             .filter(Boolean);
     }
@@ -78,95 +92,60 @@ function normalizeProduct(product) {
         images: getProductImages(product),
         materials: getProductMaterials(product),
         sizes: getProductSizes(product),
-        relatedIds: Array.isArray(product.relatedIds) ? product.relatedIds : [],
+        relatedProducts: Array.isArray(product.related_products)
+            ? product.related_products
+                  .filter((item) => item && typeof item === 'object')
+                  .map((item) => ({
+                      ...item,
+                      id: item.id ?? item.slug,
+                      slug: String(item.slug ?? item.id ?? ''),
+                  }))
+            : [],
         features: Array.isArray(product.features) ? product.features : [],
     };
 }
 
-function ProductDetailPage({ products = [] }) {
-    // 1) Leggo lo slug dalla URL.
+function ProductDetailPage() {
     const { slug } = useParams();
-    const [apiProduct, setApiProduct] = useState(null);
-    const [apiProducts, setApiProducts] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    // 2) Carico il prodotto di dettaglio dal DB e una lista base per i correlati.
+    const [product, setProduct] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeImageByProduct, setActiveImageByProduct] = useState({});
+    const [quantityByProduct, setQuantityByProduct] = useState({});
+
     useEffect(() => {
         let isMounted = true;
 
-        const loadProductData = async () => {
-            setIsLoading(true);
+        const loadProduct = async () => {
+            try {
+                setIsLoading(true);
 
-            const [detailResult, listResult] = await Promise.allSettled([
-                axios.get(`${API_PRODUCTS_URL}/${slug}`),
-                axios.get(API_PRODUCTS_URL),
-            ]);
+                const response = await axios.get(`${API_PRODUCTS_URL}/${slug}`);
 
-            if (!isMounted) {
-                return;
-            }
+                if (!isMounted) return;
 
-            const rawList = listResult.status === 'fulfilled' ? listResult.value.data : [];
-            const safeList = Array.isArray(rawList) ? rawList : [];
+                const normalized = normalizeProduct(response.data);
+                setProduct(normalized);
+            } catch (error) {
+                console.error('Errore nel caricamento del prodotto:', error);
 
-            let detailCandidate = null;
-            if (detailResult.status === 'fulfilled') {
-                const rawDetail = detailResult.value.data;
-
-                if (Array.isArray(rawDetail)) {
-                    detailCandidate = rawDetail[0] || null;
-                } else if (rawDetail && typeof rawDetail === 'object') {
-                    detailCandidate = rawDetail.product || rawDetail;
+                if (!isMounted) return;
+                setProduct(null);
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
                 }
             }
-
-            // Fallback: se endpoint dettaglio non risponde come previsto, cerco nella lista API.
-            if (!detailCandidate) {
-                detailCandidate =
-                    safeList.find((item) => String(item?.slug || item?.id) === slug) || null;
-            }
-
-            setApiProducts(safeList);
-            setApiProduct(detailCandidate);
-            setIsLoading(false);
         };
 
-        loadProductData();
+        loadProduct();
 
         return () => {
             isMounted = false;
         };
     }, [slug]);
 
-    // 3) Unisco mock + API (+ dettaglio singolo) e normalizzo in un formato unico.
-    const allProducts = useMemo(() => {
-        const mergedProducts = [...products, ...apiProducts, ...(apiProduct ? [apiProduct] : [])];
-        const uniqueProducts = new Map();
-
-        mergedProducts.forEach((item) => {
-            const key = String(item?.slug ?? item?.id ?? '');
-
-            if (!key || uniqueProducts.has(key)) {
-                return;
-            }
-
-            uniqueProducts.set(key, normalizeProduct(item));
-        });
-
-        return Array.from(uniqueProducts.values()).filter(Boolean);
-    }, [products, apiProducts, apiProduct]);
-
-    // 4) Recupero il prodotto corrente usando lo slug URL.
-    const normalizedProduct = useMemo(
-        () => allProducts.find((item) => item.slug === slug),
-        [slug, allProducts]
-    );
-
-    const [activeImageByProduct, setActiveImageByProduct] = useState({});
-    const [quantityByProduct, setQuantityByProduct] = useState({});
-
-    // 6) Stato di loading: evito "not found" durante la chiamata API.
-    if (isLoading && !normalizedProduct) {
+    if (isLoading) {
         return (
             <section className="product-page product-page--fallback">
                 <h1>Caricamento prodotto...</h1>
@@ -174,12 +153,11 @@ function ProductDetailPage({ products = [] }) {
         );
     }
 
-    // 7) Fallback se lo slug non corrisponde a nessun prodotto.
-    if (!normalizedProduct) {
+    if (!product) {
         return (
             <section className="product-page product-page--fallback">
                 <h1>Prodotto non trovato</h1>
-                <p>Il modello richiesto non e presente in questa demo.</p>
+                <p>Il prodotto richiesto non è presente nel database.</p>
                 <Link to="/" className="product-back-link">
                     Torna alla home
                 </Link>
@@ -187,10 +165,9 @@ function ProductDetailPage({ products = [] }) {
         );
     }
 
-    // 8) Correlati e stato disponibilita.
-    const currentProductKey = String(normalizedProduct.slug || normalizedProduct.id);
+    const currentProductKey = String(product.slug || product.id);
     const activeImage =
-        activeImageByProduct[currentProductKey] || normalizedProduct.images[0] || '';
+        activeImageByProduct[currentProductKey] || product.images[0] || '';
     const quantity = quantityByProduct[currentProductKey] ?? 1;
 
     const handleSelectImage = (image) => {
@@ -200,40 +177,16 @@ function ProductDetailPage({ products = [] }) {
         }));
     };
 
-    const normalizedApiProducts = apiProducts
-        .map(normalizeProduct)
-        .filter(Boolean);
-    const isBackendProduct = normalizedApiProducts.some(
-        (item) => String(item.slug || item.id) === currentProductKey
-    );
-    const relatedPool = isBackendProduct ? normalizedApiProducts : allProducts;
+    const relatedProducts = Array.isArray(product.relatedProducts)
+        ? product.relatedProducts.filter(
+              (item) =>
+                  item &&
+                  typeof item === 'object' &&
+                  String(item.slug || item.id) !== currentProductKey
+          )
+        : [];
 
-    const relatedKeys = new Set(
-        (normalizedProduct.relatedIds || []).map((item) => String(item))
-    );
-
-    let relatedProducts = [];
-
-    if (relatedKeys.size > 0) {
-        relatedProducts = relatedPool.filter((item) => {
-            const itemId = String(item.id);
-            const itemSlug = String(item.slug);
-            const itemKey = String(item.slug || item.id);
-
-            return (
-                (relatedKeys.has(itemId) || relatedKeys.has(itemSlug)) &&
-                itemKey !== currentProductKey
-            );
-        });
-    }
-
-    if (relatedProducts.length === 0) {
-        relatedProducts = relatedPool
-            .filter((item) => String(item.slug || item.id) !== currentProductKey)
-            .slice(0, 4);
-    }
-
-    const outOfStock = normalizedProduct.stock === 0;
+    const outOfStock = product.stock === 0;
 
     const decrement = () => {
         setQuantityByProduct((current) => {
@@ -257,18 +210,17 @@ function ProductDetailPage({ products = [] }) {
         });
     };
 
-    // 9) Render pagina dettaglio.
     return (
         <section className="product-page">
             <div className="product-detail">
                 <ProductGallery
-                    product={normalizedProduct}
+                    product={product}
                     activeImage={activeImage}
                     onSelectImage={handleSelectImage}
                 />
 
                 <ProductInfoPanel
-                    product={normalizedProduct}
+                    product={product}
                     quantity={quantity}
                     onDecrease={decrement}
                     onIncrease={increment}
@@ -276,7 +228,6 @@ function ProductDetailPage({ products = [] }) {
                 />
             </div>
 
-            {/* 10) Sezione correlati separata per tenere il file ordinato. */}
             <RelatedProducts products={relatedProducts} />
         </section>
     );

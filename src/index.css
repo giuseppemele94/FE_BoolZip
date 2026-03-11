@@ -1457,6 +1457,23 @@ body {
     font-size: 0.82rem;
 }
 
+.related-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.related-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transform: scale(1);
+    will-change: transform;
+}
+
+.related-card-link:hover .related-card {
+    transform: scale(1.04);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
 @media (max-width: 1024px) {
 
     .catalog__head {
