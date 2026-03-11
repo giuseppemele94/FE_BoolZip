@@ -8,20 +8,21 @@ import RelatedProducts from '../components/product-detail/RelatedProducts';
 const API_PRODUCTS_URL = 'http://localhost:3000/api/products';
 
 function getProductImages(product) {
-    const rawImages = product?.product_images ?? [];
+    const mainImage = product?.image_url || product?.image || '';
 
-    if (Array.isArray(rawImages) && rawImages.length > 0) {
-        return rawImages
-            .map((item) =>
-                typeof item === 'string'
-                    ? item
-                    : item?.image_url || item?.url || ''
-            )
-            .filter(Boolean);
-    }
+    const extraImages = Array.isArray(product?.product_images)
+        ? product.product_images
+              .map((item) =>
+                  typeof item === 'string'
+                      ? item
+                      : item?.image_url || item?.url || ''
+              )
+              .filter(Boolean)
+        : [];
 
-    const fallbackImage = product?.image_url || product?.image;
-    return fallbackImage ? [fallbackImage] : [];
+    const allImages = [mainImage, ...extraImages].filter(Boolean);
+
+    return [...new Set(allImages)];
 }
 
 function getProductMaterials(product) {
