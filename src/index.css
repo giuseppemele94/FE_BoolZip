@@ -510,6 +510,57 @@ body {
 .catalog__search-wrap {
     width: min(380px, 100%);
     margin-left: auto;
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+}
+
+.catalog__search-toggle {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    border: 1px solid #d5d9e2;
+    border-radius: 0.55rem;
+    padding: 0.44rem 0.65rem;
+    background: #fff;
+    color: #2d3544;
+    font-family: "Raleway", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.catalog__search-toggle i {
+    font-size: 0.9rem;
+}
+
+.catalog__search-toggle:hover {
+    border-color: #b9c0cd;
+    background: #f6f8fb;
+}
+
+.catalog__search-toggle.is-open {
+    border-color: #d7192d;
+    background: #d7192d;
+    color: #fff;
+}
+
+.catalog__search-panel {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: max-height 0.26s ease, opacity 0.18s ease, transform 0.22s ease;
+}
+
+.catalog__search-panel.is-open {
+    max-height: 360px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
 }
 
 .catalog__description {
@@ -1286,6 +1337,10 @@ body {
     .catalog__search-wrap {
         width: 100%;
         margin-left: 0;
+    }
+
+    .catalog__search-toggle {
+        justify-self: start;
     }
 
     .catalog__layout,

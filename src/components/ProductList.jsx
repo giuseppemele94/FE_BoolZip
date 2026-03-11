@@ -50,6 +50,8 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
     const [selectedCategory, setSelectedCategory] = useState("");
     // Gestisce apertura/chiusura del pannello filtri laterale.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
+    // Gestisce apertura/chiusura della barra ricerca con pulsante dedicato.
+    const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
     // Normalizzo la ricerca per confronto case-insensitive.
     const normalizedSearch = searchTerm.trim().toLowerCase();
     const hasPriceFilter = minPrice !== "" || maxPrice !== "";
@@ -215,13 +217,30 @@ function ProductList({ products, eyebrow, title, description, limit, showFilters
 
                 {showFilters && (
                     <div className="catalog__search-wrap">
-                        {/* Ricerca spostata sul lato opposto per accesso rapido. */}
-                        <ProductSearchBar
-                            value={searchTerm}
-                            onChange={setSearchTerm}
-                            totalCount={visibleProducts.length}
-                            visibleCount={filteredProducts.length}
-                        />
+                        <button
+                            type="button"
+                            className={`catalog__search-toggle ${isSearchPanelOpen ? "is-open" : ""}`}
+                            onClick={() => setIsSearchPanelOpen((currentValue) => !currentValue)}
+                            aria-controls="catalog-search-panel"
+                            aria-expanded={isSearchPanelOpen}
+                        >
+                            <i className={`bi ${isSearchPanelOpen ? "bi-x-lg" : "bi-search"}`} aria-hidden="true"></i>
+                            <span>{isSearchPanelOpen ? "Chiudi ricerca" : "Apri ricerca"}</span>
+                        </button>
+
+                        <div
+                            id="catalog-search-panel"
+                            className={`catalog__search-panel ${isSearchPanelOpen ? "is-open" : ""}`}
+                            aria-hidden={!isSearchPanelOpen}
+                        >
+                            {/* Barra ricerca mostrata solo quando il pannello e aperto. */}
+                            <ProductSearchBar
+                                value={searchTerm}
+                                onChange={setSearchTerm}
+                                totalCount={visibleProducts.length}
+                                visibleCount={filteredProducts.length}
+                            />
+                        </div>
                     </div>
                 )}
             </div>
