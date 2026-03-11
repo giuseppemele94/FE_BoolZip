@@ -1,311 +1,187 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ProductListCard from "./products/ProductListCard";
-import ProductPriceFilter from "./products/ProductPriceFilter";
 import ProductSearchBar from "./products/ProductSearchBar";
+import ProductPriceFilter from "./products/ProductPriceFilter";
 
-function toNumberOrNull(value) {
-    // Valori vuoti non devono attivare filtri numerici.
-    if (value === null || value === undefined) {
-        return null;
-    }
 
-    if (typeof value === "string" && value.trim() === "") {
-        return null;
-    }
 
-    const parsedValue = Number(value);
-    return Number.isFinite(parsedValue) ? parsedValue : null;
-}
+function ProductList({
+    products,
+    eyebrow,
+    title,
+    description,
+    limit,
+    showFilters = false,
+    searchTerm = "",
+    onSearchChange = () => { },
+    minPrice = "",
+    maxPrice = "",
+    onMinPriceChange = () => { },
+    onMaxPriceChange = () => { },
+    selectedCategory = "",
+    onCategoryChange = () => { },
+    onMaterialChange = () => { },
+    selectedMaterial = "",
+    selectedSize = "",
+    onSizeChange = () => { },
 
-function formatRangeNumber(value) {
-    return new Intl.NumberFormat("it-IT", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-        useGrouping: false,
-    }).format(value);
-}
+}) {
 
-function toInputPrice(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
 
-    return String(Number(value.toFixed(2)));
-}
 
-function ProductList({ products, eyebrow, title, description, limit, showFilters = false }) {
-    // Difesa base: se products non e un array uso lista vuota.
-    const safeProducts = Array.isArray(products) ? products : [];
-    // Se arriva un limit, mostro solo i primi N elementi.
-    const visibleProducts = Number.isFinite(limit)
-        ? safeProducts.slice(0, Math.max(0, limit))
-        : safeProducts;
 
-    // Stato dei campi filtro/ricerca.
-    const [searchTerm, setSearchTerm] = useState("");
-    const [minPrice, setMinPrice] = useState("");
-    const [maxPrice, setMaxPrice] = useState("");
-    const [selectedMaterial, setSelectedMaterial] = useState("");
-    const [selectedSize, setSelectedSize] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("");
-    // Gestisce apertura/chiusura del pannello filtri laterale.
-    const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
-    // Gestisce apertura/chiusura della barra ricerca con pulsante dedicato.
-    const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
-    // Normalizzo la ricerca per confronto case-insensitive.
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-    const hasPriceFilter = minPrice !== "" || maxPrice !== "";
+    const visibleProducts = useMemo(() => {
+        const safeProducts = Array.isArray(products) ? [...products] : [];
 
-    const filterOptions = useMemo(() => {
-        // Estraggo opzioni uniche direttamente dai prodotti ricevuti dal DB.
-        // Set rimuove i duplicati e sort rende stabile l'ordine nelle select.
-        const materials = [...new Set(visibleProducts.map((item) => item?.material).filter(Boolean))].sort();
-        const sizes = [...new Set(visibleProducts.map((item) => item?.size).filter(Boolean))].sort();
-        const categories = [...new Set(visibleProducts.map((item) => item?.category).filter(Boolean))].sort();
+        if (typeof limit === "number" && limit > 0) {
+            return safeProducts.slice(0, limit);
+        }
 
-        return {
-            materials,
-            sizes,
-            categories,
-        };
+        return safeProducts;
+    }, [products, limit]);
+
+
+
+    const categoryOptions = [
+        { id: "1", label: "Classic" },
+        { id: "2", label: "Electric" },
+    ];
+
+    const materialOptions = [
+        { id: "1", label: "Brass" },
+        { id: "2", label: "Chrome" },
+        { id: "3", label: "Matte Black Steel" },
+        { id: "4", label: "Copper" },
+        { id: "5", label: "Titanium" },
+        { id: "6", label: "Gold Plated" },
+    ];
+
+    const sizeOptions = [
+        { id: "1", label: "Slim" },
+        { id: "2", label: "Standard" },
+
+    ];
+
+    const productsToRender = useMemo(() => {
+        return visibleProducts;
     }, [visibleProducts]);
 
-    const quickPriceRanges = useMemo(() => {
-        // Creo scorciatoie prezzo usando il range reale disponibile in catalogo.
-        const numericPrices = visibleProducts
-            .map((item) => toNumberOrNull(item?.price))
-            .filter((value) => value !== null);
+    const hasActiveFilters =
+        searchTerm !== "" ||
+        minPrice !== "" ||
+        maxPrice !== "" ||
+        selectedMaterial !== "" ||
+        selectedSize !== "" ||
+        selectedCategory !== "";
 
-        if (numericPrices.length === 0) {
-            return [];
-        }
-
-        const min = Math.min(...numericPrices);
-        const max = Math.max(...numericPrices);
-
-        if (min === max) {
-            return [
-                {
-                    id: "fixed",
-                    label: `${formatRangeNumber(min)}`,
-                    min,
-                    max,
-                },
-            ];
-        }
-
-        const span = max - min;
-        const lowCap = Number((min + span * 0.35).toFixed(2));
-        const highFloor = Number((min + span * 0.65).toFixed(2));
-
-        return [
-            {
-                id: "budget",
-                label: `${formatRangeNumber(min)}-${formatRangeNumber(lowCap)}`,
-                min,
-                max: lowCap,
-            },
-            {
-                id: "middle",
-                label: `${formatRangeNumber(lowCap)}-${formatRangeNumber(highFloor)}`,
-                min: lowCap,
-                max: highFloor,
-            },
-            {
-                id: "premium",
-                label: `${formatRangeNumber(highFloor)}-${formatRangeNumber(max)}`,
-                min: highFloor,
-                max,
-            },
-        ];
-    }, [visibleProducts]);
-
-    useEffect(() => {
-        // Se il DB cambia, resetto solo le selezioni non piu valide.
-        if (selectedMaterial && !filterOptions.materials.includes(selectedMaterial)) {
-            setSelectedMaterial("");
-        }
-
-        if (selectedSize && !filterOptions.sizes.includes(selectedSize)) {
-            setSelectedSize("");
-        }
-
-        if (selectedCategory && !filterOptions.categories.includes(selectedCategory)) {
-            setSelectedCategory("");
-        }
-    }, [filterOptions, selectedCategory, selectedMaterial, selectedSize]);
-
-    // Verifico se almeno un filtro per caratteristiche e attivo.
-    const hasAttributeFilter =
-        (filterOptions.materials.length > 0 && selectedMaterial !== "") ||
-        (filterOptions.sizes.length > 0 && selectedSize !== "") ||
-        (filterOptions.categories.length > 0 && selectedCategory !== "");
-    // Flag unico usato per capire quando filtrare davvero la lista.
-    const hasActiveFilters = normalizedSearch.length > 0 || hasPriceFilter || hasAttributeFilter;
-
-    const filteredProducts = useMemo(() => {
-        // Se non ci sono filtri attivi, restituisco direttamente tutti i prodotti visibili.
-        if (!showFilters || !hasActiveFilters) {
-            return visibleProducts;
-        }
-
-        // Gestisco anche il caso in cui l'utente inserisca prima il massimo e poi il minimo.
-        const parsedMin = toNumberOrNull(minPrice);
-        const parsedMax = toNumberOrNull(maxPrice);
-        const minBound = parsedMin !== null && parsedMax !== null ? Math.min(parsedMin, parsedMax) : parsedMin;
-        const maxBound = parsedMin !== null && parsedMax !== null ? Math.max(parsedMin, parsedMax) : parsedMax;
-
-        // Tutti i filtri lavorano insieme in AND.
-        return visibleProducts.filter((product) => {
-            const productName = String(product?.name || "").toLowerCase();
-            const productPrice = toNumberOrNull(product?.price);
-
-            // Ogni condizione e opzionale: se il filtro e vuoto passa automaticamente.
-            const matchesName = normalizedSearch.length === 0 || productName.includes(normalizedSearch);
-            const matchesMin = minBound === null || (productPrice !== null && productPrice >= minBound);
-            const matchesMax = maxBound === null || (productPrice !== null && productPrice <= maxBound);
-            const matchesMaterial =
-                filterOptions.materials.length === 0 || selectedMaterial === "" || product?.material === selectedMaterial;
-            const matchesSize = filterOptions.sizes.length === 0 || selectedSize === "" || product?.size === selectedSize;
-            const matchesCategory =
-                filterOptions.categories.length === 0 || selectedCategory === "" || product?.category === selectedCategory;
-
-            return matchesName && matchesMin && matchesMax && matchesMaterial && matchesSize && matchesCategory;
-        });
-    }, [
-        hasActiveFilters,
-        maxPrice,
-        minPrice,
-        normalizedSearch,
-        selectedCategory,
-        selectedMaterial,
-        selectedSize,
-        showFilters,
-        filterOptions.categories.length,
-        filterOptions.materials.length,
-        filterOptions.sizes.length,
-        visibleProducts,
-    ]);
-
-    // Se non ci sono filtri attivi mostro sempre l'elenco completo.
-    const productsToRender = showFilters && hasActiveFilters ? filteredProducts : visibleProducts;
-
-    // Ripristina la pagina allo stato iniziale dei filtri.
     function resetFilters() {
-        setSearchTerm("");
-        setMinPrice("");
-        setMaxPrice("");
-        setSelectedMaterial("");
-        setSelectedSize("");
-        setSelectedCategory("");
-    }
+        onSearchChange("");
+        onMinPriceChange("");
+        onMaxPriceChange("");
 
-    function applyQuickPriceRange(nextMin, nextMax) {
-        // Collego i bottoni range ai campi prezzo controllati.
-        setMinPrice(toInputPrice(nextMin));
-        setMaxPrice(toInputPrice(nextMax));
+        onSizeChange(""); 
+        onCategoryChange("");
+        onMaterialChange("");
     }
 
     return (
         <section className="catalog">
             <div className="catalog__head">
-                <div className="catalog__head-main">
-                    <p className="catalog__eyebrow">{eyebrow}</p>
-                    <h2 id="catalog-title">{title}</h2>
-                    {description && <p className="catalog__description">{description}</p>}
-                </div>
-
-                {showFilters && (
-                    <div className="catalog__search-wrap">
-                        <button
-                            type="button"
-                            className={`catalog__search-toggle ${isSearchPanelOpen ? "is-open" : ""}`}
-                            onClick={() => setIsSearchPanelOpen((currentValue) => !currentValue)}
-                            aria-controls="catalog-search-panel"
-                            aria-expanded={isSearchPanelOpen}
-                        >
-                            <i className={`bi ${isSearchPanelOpen ? "bi-x-lg" : "bi-search"}`} aria-hidden="true"></i>
-                            <span>{isSearchPanelOpen ? "Chiudi ricerca" : "Apri ricerca"}</span>
-                        </button>
-
-                        <div
-                            id="catalog-search-panel"
-                            className={`catalog__search-panel ${isSearchPanelOpen ? "is-open" : ""}`}
-                            aria-hidden={!isSearchPanelOpen}
-                        >
-                            {/* Barra ricerca mostrata solo quando il pannello e aperto. */}
-                            <ProductSearchBar
-                                value={searchTerm}
-                                onChange={setSearchTerm}
-                                totalCount={visibleProducts.length}
-                                visibleCount={filteredProducts.length}
-                            />
-                        </div>
-                    </div>
-                )}
+                {eyebrow && <p className="catalog__eyebrow">{eyebrow}</p>}
+                {title && <h2 id="catalog-title">{title}</h2>}
+                {description && <p className="catalog__description">{description}</p>}
             </div>
 
-            {showFilters ? (
-                // Layout con sidebar filtri + griglia prodotti.
-                <div className={`catalog__layout ${isFiltersPanelOpen ? "is-filters-open" : ""}`}>
-                    <div
-                        id="catalog-filters-panel"
-                        className="catalog__filters-panel"
-                        aria-hidden={!isFiltersPanelOpen}
-                    >
-                        {/* Sidebar filtri: resta montata e viene mostrata con animazione CSS. */}
-                        <ProductPriceFilter
-                            minPrice={minPrice}
-                            maxPrice={maxPrice}
-                            selectedMaterial={selectedMaterial}
-                            selectedSize={selectedSize}
-                            selectedCategory={selectedCategory}
-                            materialOptions={filterOptions.materials}
-                            sizeOptions={filterOptions.sizes}
-                            categoryOptions={filterOptions.categories}
-                            onMinPriceChange={setMinPrice}
-                            onMaxPriceChange={setMaxPrice}
-                            quickPriceRanges={quickPriceRanges}
-                            onQuickPriceRange={applyQuickPriceRange}
-                            onMaterialChange={setSelectedMaterial}
-                            onSizeChange={setSelectedSize}
-                            onCategoryChange={setSelectedCategory}
-                            onReset={resetFilters}
-                        />
+            {showFilters && (
+                <div className="catalog__filters">
+                    <ProductSearchBar
+                        value={searchTerm}
+                        onChange={onSearchChange}
+                        totalCount={visibleProducts.length}
+                        visibleCount={productsToRender.length}
+                    />
+
+                    <ProductPriceFilter
+                        minPrice={minPrice}
+                        maxPrice={maxPrice}
+                        onMinPriceChange={onMinPriceChange}
+                        onMaxPriceChange={onMaxPriceChange}
+                    />
+
+                    <div className="catalog__filter-group">
+                        <label htmlFor="category-filter">Categoria</label>
+                        <select
+                            id="category-filter"
+                            value={selectedCategory}
+                            onChange={(e) => onCategoryChange(e.target.value)}
+                        >
+                            <option value="">Tutte</option>
+                            {categoryOptions.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.label}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
-                    <div className="catalog__content">
-                        {/* Pulsante con icona che apre/chiude dinamicamente il pannello filtri. */}
+                    {materialOptions.length > 0 && (
+                        <div className="catalog__filter-group">
+                            <label htmlFor="material-filter">Materiale</label>
+                            <select
+                                id="material-filter"
+                                value={selectedMaterial}
+                                onChange={(e) => onMaterialChange(e.target.value)}
+                            >
+                                <option value="">Tutti</option>
+                                {materialOptions.map((material) => (
+                                    <option key={material.id} value={material.id}>
+                                        {material.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {sizeOptions.length > 0 && (
+                        <div className="catalog__filter-group">
+                            <label htmlFor="size-filter">Taglia</label>
+                            <select
+                                id="size-filter"
+                                value={selectedSize}
+                                onChange={(e) => onSizeChange(e.target.value)}
+                            >
+                                <option value="">Tutte</option>
+                                {sizeOptions.map((size) => (
+                                    <option key={size.id} value={size.id}>
+                                        {size.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {hasActiveFilters && (
                         <button
                             type="button"
-                            className={`catalog__filters-toggle ${isFiltersPanelOpen ? "is-open" : ""}`}
-                            onClick={() => setIsFiltersPanelOpen((currentValue) => !currentValue)}
-                            aria-controls="catalog-filters-panel"
-                            aria-expanded={isFiltersPanelOpen}
+                            className="catalog__reset-btn"
+                            onClick={resetFilters}
                         >
-                            <i className={`bi ${isFiltersPanelOpen ? "bi-x-lg" : "bi-sliders2"}`} aria-hidden="true"></i>
-                            <span>{isFiltersPanelOpen ? "Chiudi filtri" : "Apri filtri"}</span>
+                            Reset filtri
                         </button>
-
-                        {productsToRender.length === 0 ? (
-                            // Messaggio mostrato solo quando i filtri non trovano risultati.
-                            <p className="catalog__empty">Nessun prodotto trovato con i filtri selezionati.</p>
-                        ) : (
-                            <div className="catalog__grid">
-                                {productsToRender.map((product) => (
-                                    <ProductListCard key={product.slug || product.id} product={product} />
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    )}
                 </div>
-            ) : (
-                // Versione compatta del componente senza area filtri (es. homepage).
+            )}
+
+            {productsToRender.length > 0 ? (
                 <div className="catalog__grid">
                     {productsToRender.map((product) => (
                         <ProductListCard key={product.slug || product.id} product={product} />
                     ))}
                 </div>
+            ) : (
+                <p className="catalog__empty">
+                    Nessun prodotto trovato con i filtri selezionati.
+                </p>
             )}
         </section>
     );
