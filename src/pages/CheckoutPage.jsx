@@ -3,11 +3,18 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 
+// URL base delle API ordini del backend
 const API_BASE_URL = "http://localhost:3000/api/orders";
 
 function CheckoutPage() {
+    // Recupero dal context:
+    // - i prodotti nel carrello
+    // - il totale base del carrello
+    // - la funzione per svuotarlo dopo ordine concluso
     const { cartItems, cartTotal, clearCart } = useCart();
 
+    // Stato del form checkout:
+    // contiene i dati cliente e l'eventuale codice sconto inserito
     const [formData, setFormData] = useState({
         customer_name: "",
         customer_lastname: "",
@@ -18,24 +25,42 @@ function CheckoutPage() {
         discount_code: "",
     });
 
+    // Stato dello sconto applicato.
+    // Viene aggiornato dopo la verifica del coupon lato backend.
     const [appliedDiscount, setAppliedDiscount] = useState(0);
+
+    // Messaggio legato al coupon:
+    // ad esempio "coupon applicato" oppure errore sul coupon
     const [couponMessage, setCouponMessage] = useState("");
+
+    // Stato di caricamento durante la conferma dell'ordine
     const [loading, setLoading] = useState(false);
+
+    // Messaggio di errore generico del checkout
     const [errorMessage, setErrorMessage] = useState("");
+
+    // Messaggio di successo mostrato dopo il checkout completato
     const [successMessage, setSuccessMessage] = useState("");
 
+    // Verifico se il carrello è vuoto
     const isCartEmpty = cartItems.length === 0;
 
-    /*Totale scontato* */
+    /*
+      Calcolo del totale scontato mostrato nel riepilogo.
+      Questo valore è solo una preview lato frontend:
+      il calcolo definitivo deve comunque essere confermato dal backend.
+    */
     const discountedTotal = useMemo(() => {
         const total = Number(cartTotal) - Number(appliedDiscount || 0);
         return total > 0 ? total.toFixed(2) : "0.00";
     }, [cartTotal, appliedDiscount]);
 
+    // Totale originale del carrello, senza sconto
     const formattedTotal = useMemo(() => {
         return Number(cartTotal).toFixed(2);
     }, [cartTotal]);
 
+    // Funzione generica per aggiornare i campi del form
     function handleChange(e) {
         const { name, value } = e.target;
 
@@ -45,9 +70,18 @@ function CheckoutPage() {
         }));
     }
 
+    /*
+      Invio del checkout:
+      - raccoglie i dati del cliente
+      - costruisce il payload
+      - invia tutto al backend
+      - in caso di successo svuota il carrello
+      - mostra il messaggio finale di conferma
+    */
     async function handleSubmit(e) {
         e.preventDefault();
 
+        // Blocco di sicurezza: se il carrello è vuoto non procedo
         if (isCartEmpty) {
             setErrorMessage("Il carrello è vuoto.");
             return;
@@ -58,6 +92,7 @@ function CheckoutPage() {
             setErrorMessage("");
             setSuccessMessage("");
 
+            // Payload inviato al backend
             const payload = {
                 customer_name: formData.customer_name,
                 customer_lastname: formData.customer_lastname,
@@ -65,26 +100,39 @@ function CheckoutPage() {
                 customer_email: formData.customer_email,
                 customer_address: formData.customer_address,
                 customer_billing_address: formData.customer_billing_address,
+
+                // Trasformo i prodotti del carrello nel formato atteso dal backend
                 products: cartItems.map((item) => ({
                     id: item.product_id,
                     quantity: item.quantity,
                     price: item.price,
                 })),
+
+                // Se il coupon non è stato inserito mando null
                 discount_code: formData.discount_code.trim() || null,
+
+                // Valore dello sconto applicato lato FE
+                // Il backend dovrebbe comunque validarlo/ricalcolarlo
                 discount_value: appliedDiscount || 0,
+
+                // Session id semplice generata lato frontend
                 session_id: `sess_${Date.now()}`,
             };
 
+            // POST al backend per creare l'ordine
             const response = await axios.post(`${API_BASE_URL}/checkout`, payload);
 
+            // Salvo il messaggio di successo da mostrare in pagina
             setSuccessMessage(
                 `Il tuo ordine è stato eseguito con successo! ID ordine: ${response.data.id}`
             );
 
+            // Svuoto il carrello dopo la conferma dell'ordine
             clearCart();
         } catch (error) {
             console.error("Errore checkout:", error);
 
+            // Recupero eventuale messaggio di errore dal backend
             const message =
                 error.response?.data?.error ||
                 "Si è verificato un errore durante il checkout.";
@@ -95,6 +143,10 @@ function CheckoutPage() {
         }
     }
 
+    /*
+      Se l'ordine è stato completato con successo,
+      mostro una schermata finale di conferma al posto del form checkout.
+    */
     if (successMessage) {
         return (
             <section className="checkout-page checkout-page--success">
@@ -116,6 +168,10 @@ function CheckoutPage() {
         );
     }
 
+    /*
+      Se il carrello è vuoto e non c'è un ordine appena completato,
+      mostro una schermata vuota con link ai prodotti.
+    */
     if (isCartEmpty) {
         return (
             <section className="checkout-page checkout-page--empty">
@@ -129,11 +185,15 @@ function CheckoutPage() {
         );
     }
 
-
-    //Funzione per applicare il coupon e calcolare lo sconto
+    /*
+      Funzione che verifica il coupon lato backend.
+      Il frontend manda il codice inserito alla route di controllo coupon.
+      Se il coupon è valido, salva lo sconto nello stato.
+    */
     async function handleApplyCoupon() {
         const code = formData.discount_code.trim();
 
+        // Se il campo è vuoto mostro subito un messaggio
         if (!code) {
             setCouponMessage("Inserisci un codice sconto.");
             setAppliedDiscount(0);
@@ -141,20 +201,25 @@ function CheckoutPage() {
         }
 
         try {
+            // Chiamata alla route backend per la verifica del coupon
             const response = await axios.post("http://localhost:3000/api/discounts/check", {
                 code,
             });
 
             if (response.data.valid) {
+                // Se il coupon è valido salvo il valore dello sconto
                 setAppliedDiscount(Number(response.data.discount) || 0);
                 setCouponMessage("Coupon applicato con successo.");
                 setErrorMessage("");
             } else {
+                // Se non è valido, resetto sconto e mostro il messaggio ricevuto
                 setAppliedDiscount(0);
                 setCouponMessage(response.data.message || "Coupon non valido.");
             }
         } catch (error) {
             console.error(error);
+
+            // In caso di errore backend o di rete
             setAppliedDiscount(0);
             setCouponMessage(
                 error.response?.data?.message || "Errore nella verifica del coupon."
@@ -164,12 +229,13 @@ function CheckoutPage() {
 
     return (
         <section className="checkout-page">
+            {/* Header della pagina checkout */}
             <div className="checkout-page__header">
                 <h1>Checkout</h1>
                 <p>Inserisci i tuoi dati per completare l’ordine.</p>
             </div>
 
-
+            {/* Banner errore generico del checkout */}
             {errorMessage && (
                 <div className="checkout-banner checkout-banner--error">
                     {errorMessage}
@@ -177,6 +243,7 @@ function CheckoutPage() {
             )}
 
             <div className="checkout-page__content">
+                {/* Form principale del checkout */}
                 <form className="checkout-form" onSubmit={handleSubmit}>
                     <div className="checkout-form__grid">
                         <div className="checkout-form__field">
@@ -252,6 +319,8 @@ function CheckoutPage() {
                                 required
                             />
                         </div>
+
+                        {/* Campo coupon opzionale */}
                         <div className="checkout-form__field checkout-form__field--full">
                             <label htmlFor="discount_code">Codice sconto (opzionale)</label>
                             <div className="checkout-form__coupon-row">
@@ -264,6 +333,7 @@ function CheckoutPage() {
                                     placeholder="Inserisci il coupon"
                                 />
 
+                                {/* Pulsante che verifica il coupon */}
                                 <button
                                     type="button"
                                     className="checkout-form__coupon-btn"
@@ -274,6 +344,7 @@ function CheckoutPage() {
                             </div>
                         </div>
 
+                        {/* Messaggio legato al coupon */}
                         {couponMessage && (
                             <p className="checkout-form__message checkout-form__message--success">
                                 {couponMessage}
@@ -281,6 +352,7 @@ function CheckoutPage() {
                         )}
                     </div>
 
+                    {/* Pulsante finale di conferma ordine */}
                     <button
                         type="submit"
                         className="checkout-form__submit"
@@ -290,6 +362,7 @@ function CheckoutPage() {
                     </button>
                 </form>
 
+                {/* Riepilogo ordine laterale */}
                 <aside className="checkout-summary">
                     <h2>Riepilogo ordine</h2>
 
@@ -315,6 +388,7 @@ function CheckoutPage() {
                         </div>
                     )}
 
+                    {/* Totali finali */}
                     <div className="checkout-summary__totals">
                         <div className="checkout-summary__row">
                             <span>Subtotale</span>
