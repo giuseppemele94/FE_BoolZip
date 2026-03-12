@@ -114,8 +114,22 @@ function ProductListCard({ product }) {
         }).format(numericPrice)
         : '0,00';
 
-    const handleAddToCart = () => {
-        addToCart(product);
+    const handleAddToCart = async (event) => {
+        const sourceRect = event.currentTarget.getBoundingClientRect();
+        let hoverImageForCart = hoverImage || localSecondImage || secondImageCache.get(productSlug) || '';
+
+        if (!hoverImageForCart && productSlug) {
+            hoverImageForCart = await fetchSecondDetailImage(productSlug);
+
+            if (isMountedRef.current && hoverImageForCart) {
+                setHoverImage(hoverImageForCart);
+            }
+        }
+
+        addToCart(product, 1, {
+            sourceRect,
+            hoverImage: hoverImageForCart,
+        });
     };
     return (
         <article className="catalog-card" onMouseEnter={handleCardHover}>

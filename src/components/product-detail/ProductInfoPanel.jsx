@@ -76,7 +76,7 @@ function ProductInfoPanel({
                 type="button"
                 className="product-cta"
                 disabled={outOfStock}
-                onClick={onAddToCart}
+                onClick={(event) => onAddToCart(event)}
             >
                 {outOfStock ? 'Esaurito' : 'Aggiungi al carrello'}
             </button>

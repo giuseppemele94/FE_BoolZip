@@ -10,6 +10,29 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+function normalizeImage(item) {
+  if (typeof item === "string") {
+    return item;
+  }
+
+  if (!item || typeof item !== "object") {
+    return "";
+  }
+
+  return item.image_url || item.url || item.src || "";
+}
+
+function getProductImages(product) {
+  const mainImage = normalizeImage(product?.image_url || product?.image);
+  const extraImages = Array.isArray(product?.product_images)
+    ? product.product_images.map(normalizeImage)
+    : Array.isArray(product?.images)
+      ? product.images.map(normalizeImage)
+      : [];
+
+  return [...new Set([mainImage, ...extraImages].filter(Boolean))];
+}
+
 // Creo il context del carrello.
 // Servirà per condividere i dati del carrello in tutta l'app senza passare props a catena.
 const CartContext = createContext();
@@ -22,6 +45,9 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // Stato del pannello carrello laterale.
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+
   // Ogni volta che cartItems cambia, salvo il nuovo carrello in localStorage.
   // In questo modo il carrello resta anche dopo il refresh della pagina.
   useEffect(() => {
@@ -31,9 +57,12 @@ export function CartProvider({ children }) {
   // Funzione per aggiungere un prodotto al carrello.
   // Se il prodotto esiste già, aumento la quantità.
   // Se non esiste, lo aggiungo come nuovo elemento.
-  function addToCart(product, quantityToAdd = 1) {
+  function addToCart(product, quantityToAdd = 1, options = {}) {
     // Converto la quantità in numero per sicurezza.
     const parsedQuantity = Number(quantityToAdd) || 1;
+    const productImages = getProductImages(product);
+    const mainProductImage = productImages[0] || "";
+    const secondaryProductImage = options.hoverImage || productImages[1] || "";
 
     setCartItems((prev) => {
       // Controllo se il prodotto è già presente nel carrello.
@@ -45,7 +74,12 @@ export function CartProvider({ children }) {
       if (existingProduct) {
         return prev.map((item) =>
           item.product_id === product.id
-            ? { ...item, quantity: item.quantity + parsedQuantity }
+            ? {
+              ...item,
+              quantity: item.quantity + parsedQuantity,
+              image_url: item.image_url || mainProductImage,
+              hover_image_url: item.hover_image_url || secondaryProductImage,
+            }
             : item
         );
       }
@@ -71,13 +105,36 @@ export function CartProvider({ children }) {
           // prima provo image_url,
           // altrimenti provo la prima immagine dell'array images,
           // altrimenti stringa vuota.
-          image_url: product.image_url || product.images?.[0] || "",
+          image_url: mainProductImage,
+
+          // Seconda immagine usata per l'effetto hover (accendino aperto/acceso).
+          hover_image_url: secondaryProductImage,
 
           // Quantità iniziale da aggiungere.
           quantity: parsedQuantity,
         },
       ];
     });
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("cart:product-added", {
+          detail: {
+            name: product.name,
+            image_url: mainProductImage,
+            sourceRect: options.sourceRect || null,
+          },
+        })
+      );
+
+      // Apro il drawer dopo la breve animazione di "volo" verso il carrello.
+      const isCartPage = window.location.pathname === "/cart";
+      if (!isCartPage) {
+        window.setTimeout(() => {
+          setIsCartDrawerOpen(true);
+        }, 420);
+      }
+    }
   }
 
   // Rimuove completamente un prodotto dal carrello.
@@ -136,6 +193,18 @@ export function CartProvider({ children }) {
     setCartItems([]);
   }
 
+  function openCartDrawer() {
+    setIsCartDrawerOpen(true);
+  }
+
+  function closeCartDrawer() {
+    setIsCartDrawerOpen(false);
+  }
+
+  function toggleCartDrawer() {
+    setIsCartDrawerOpen((prev) => !prev);
+  }
+
   // Calcolo il numero totale di articoli nel carrello.
   // Non conta i prodotti distinti, ma la somma di tutte le quantità.
   // useMemo evita di ricalcolarlo inutilmente a ogni render.
@@ -164,6 +233,10 @@ export function CartProvider({ children }) {
     clearCart,
     cartCount,
     cartTotal,
+    isCartDrawerOpen,
+    openCartDrawer,
+    closeCartDrawer,
+    toggleCartDrawer,
   };
 
   // Rendo disponibile il context a tutti i componenti figli.
