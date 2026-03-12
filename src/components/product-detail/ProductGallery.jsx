@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 
 function ProductGallery({ product, activeImage, onSelectImage }) {
-    // 1) Preparo la lista immagini e seleziono quella principale valida.
+    // 1) Preparo lista immagini e immagine principale.
     const images = Array.isArray(product.images) ? product.images : [];
     const mainImage = activeImage || images[0] || '';
     const currentIndex = Math.max(0, images.indexOf(mainImage));
     const canSlide = images.length > 1;
 
-    // 2) Stato fullscreen per apertura/chiusura della vista ingrandita.
+    // 2) Stato fullscreen (aperto/chiuso).
     const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
+    // 3) Stato lente e posizione puntatore nel fullscreen.
+    const [isLensActive, setIsLensActive] = useState(false);
+    const [lensPosition, setLensPosition] = useState({ x: 50, y: 50 });
+    const LENS_ZOOM_SCALE = 3.1;
 
-    // 3) Apro il fullscreen al click sulla foto principale.
+    // 4) Apro fullscreen al click sulla foto principale.
     const openFullscreen = () => {
         if (!mainImage) {
             return;
@@ -19,16 +23,42 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
         setIsFullscreenOpen(true);
     };
 
-    // 4) Chiudo il fullscreen (overlay, bottone X o click immagine ingrandita).
+    // 5) Chiudo fullscreen e resetto la lente.
     const closeFullscreen = (event) => {
         if (event) {
             event.stopPropagation();
         }
 
+        setIsLensActive(false);
         setIsFullscreenOpen(false);
     };
 
-    // 5) Accessibilita: Enter/Spazio aprono il fullscreen da tastiera.
+    // 6) Toggle lente (bottone o click immagine fullscreen).
+    const toggleLens = (event) => {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        setIsLensActive((current) => !current);
+    };
+
+    // 7) Aggiorno posizione lente in percentuale.
+    const handleLensMove = (event) => {
+        if (!isLensActive) {
+            return;
+        }
+
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+        const y = ((event.clientY - bounds.top) / bounds.height) * 100;
+
+        setLensPosition({
+            x: Math.max(0, Math.min(100, x)),
+            y: Math.max(0, Math.min(100, y)),
+        });
+    };
+
+    // 8) Accessibilita: Enter/Spazio aprono fullscreen.
     const handleMainImageKeyDown = (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -36,12 +66,12 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
         }
     };
 
-    // 6) Utility per impedire che i click sui controlli chiudano il modal.
+    // 9) Evito che i click dei controlli chiudano il modal.
     const stopEventPropagation = (event) => {
         event.stopPropagation();
     };
 
-    // 7) Navigazione carosello indietro.
+    // 10) Vai all'immagine precedente.
     const showPreviousImage = () => {
         if (!canSlide) {
             return;
@@ -51,7 +81,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
         onSelectImage(images[previousIndex]);
     };
 
-    // 8) Navigazione carosello avanti.
+    // 11) Vai all'immagine successiva.
     const showNextImage = () => {
         if (!canSlide) {
             return;
@@ -61,7 +91,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
         onSelectImage(images[nextIndex]);
     };
 
-    // 9) Quando il fullscreen e aperto: blocco scroll pagina e abilito shortcut tastiera.
+    // 12) In fullscreen: blocco scroll e abilito shortcut tastiera.
     useEffect(() => {
         if (!isFullscreenOpen) {
             return undefined;
@@ -71,16 +101,24 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
         document.body.style.overflow = 'hidden';
 
         const handleKeyDown = (event) => {
+            // Chiusura rapida modal.
             if (event.key === 'Escape') {
                 setIsFullscreenOpen(false);
+                setIsLensActive(false);
             }
 
+            // Navigazione da tastiera nel carosello.
             if (canSlide && event.key === 'ArrowLeft') {
                 showPreviousImage();
             }
 
             if (canSlide && event.key === 'ArrowRight') {
                 showNextImage();
+            }
+
+            // Toggle lente da tastiera.
+            if (event.key.toLowerCase() === 'z') {
+                setIsLensActive((current) => !current);
             }
         };
 
@@ -94,7 +132,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
 
     return (
         <div className="product-gallery">
-            {/* 10) Immagine principale cliccabile per aprire il fullscreen. */}
+            {/* 13) Immagine principale cliccabile per aprire fullscreen. */}
             <figure
                 className="product-main-image"
                 role="button"
@@ -109,6 +147,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
 
                 {canSlide && (
                     <>
+                        {/* Freccia precedente sulla foto principale. */}
                         <button
                             type="button"
                             className="product-main-image__nav product-main-image__nav--prev"
@@ -122,6 +161,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                             <span className="product-main-image__nav-icon" aria-hidden="true">&lt;</span>
                         </button>
 
+                        {/* Freccia successiva sulla foto principale. */}
                         <button
                             type="button"
                             className="product-main-image__nav product-main-image__nav--next"
@@ -138,7 +178,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                 )}
             </figure>
 
-            {/* 11) Miniature per cambiare rapidamente immagine nel dettaglio. */}
+            {/* 14) Miniature per cambiare rapidamente immagine. */}
             <div className="product-thumbs" aria-label="Miniature prodotto">
                 {images.map((img, index) => (
                     <button
@@ -153,7 +193,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                 ))}
             </div>
 
-            {/* 12) Overlay fullscreen con chiusura su sfondo, X e click sull'immagine. */}
+            {/* 15) Overlay fullscreen con X, frecce e lente. */}
             {isFullscreenOpen && (
                 <div
                     className="product-lightbox"
@@ -164,7 +204,9 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                 >
                     <div className="product-lightbox__backdrop" />
 
+                    {/* Contenuto modal: blocco click per evitare chiusure involontarie. */}
                     <div className="product-lightbox__content" onClick={stopEventPropagation}>
+                        {/* Pulsante chiusura fullscreen. */}
                         <button
                             type="button"
                             className="product-lightbox__close"
@@ -174,8 +216,19 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                             ×
                         </button>
 
+                        {/* Pulsante attiva/disattiva lente. */}
+                        <button
+                            type="button"
+                            className={`product-lightbox__lens-toggle ${isLensActive ? 'is-active' : ''}`}
+                            onClick={toggleLens}
+                            aria-label={isLensActive ? 'Disattiva lente' : 'Attiva lente'}
+                        >
+                            Lente
+                        </button>
+
                         {canSlide && (
                             <>
+                                {/* Freccia precedente in fullscreen. */}
                                 <button
                                     type="button"
                                     className="product-lightbox__nav product-lightbox__nav--prev"
@@ -185,6 +238,7 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                                     <span aria-hidden="true">&lt;</span>
                                 </button>
 
+                                {/* Freccia successiva in fullscreen. */}
                                 <button
                                     type="button"
                                     className="product-lightbox__nav product-lightbox__nav--next"
@@ -196,12 +250,32 @@ function ProductGallery({ product, activeImage, onSelectImage }) {
                             </>
                         )}
 
-                        <img
-                            src={mainImage}
-                            alt={`${product.name} a schermo intero`}
-                            className="product-lightbox__img"
-                            onClick={closeFullscreen}
-                        />
+                        {/* Wrapper immagine fullscreen: click toggle lente, mouse move aggiorna posizione. */}
+                        <div
+                            className={`product-lightbox__image-wrap ${isLensActive ? 'is-lens-active' : ''}`}
+                            onClick={toggleLens}
+                            onMouseMove={handleLensMove}
+                            onMouseLeave={() => setLensPosition({ x: 50, y: 50 })}
+                        >
+                            <img
+                                src={mainImage}
+                                alt={`${product.name} a schermo intero`}
+                                className={`product-lightbox__img ${isLensActive ? 'is-lens-active' : ''}`}
+                            />
+
+                            {isLensActive && (
+                                <span
+                                    className="product-lightbox__lens"
+                                    style={{
+                                        left: `${lensPosition.x}%`,
+                                        top: `${lensPosition.y}%`,
+                                        backgroundImage: `url(${mainImage})`,
+                                        backgroundPosition: `${lensPosition.x}% ${lensPosition.y}%`,
+                                        backgroundSize: `${LENS_ZOOM_SCALE * 100}%`,
+                                    }}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
