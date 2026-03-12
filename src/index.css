@@ -1388,7 +1388,62 @@ body {
     border-radius: 0.45rem;
     box-shadow: 0 22px 50px rgba(0, 0, 0, 0.34);
     background: transparent;
+    cursor: zoom-in;
+    display: block;
+}
+
+.product-lightbox__image-wrap {
+    position: relative;
+    max-width: 100%;
+    max-height: 87vh;
+    display: inline-block;
+}
+
+.product-lightbox__image-wrap.is-lens-active {
     cursor: zoom-out;
+}
+
+.product-lightbox__img.is-lens-active {
+    cursor: none;
+}
+
+.product-lightbox__lens {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.36);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 3;
+    background-repeat: no-repeat;
+}
+
+.product-lightbox__lens-toggle {
+    position: absolute;
+    top: 0.6rem;
+    right: 3.35rem;
+    min-width: 60px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.36);
+    border-radius: 999px;
+    background: rgba(20, 25, 35, 0.5);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.product-lightbox__lens-toggle:hover {
+    background: rgba(20, 25, 35, 0.72);
+    transform: scale(1.03);
+}
+
+.product-lightbox__lens-toggle.is-active {
+    background: rgba(215, 25, 45, 0.78);
+    border-color: rgba(255, 255, 255, 0.66);
 }
 
 .product-lightbox__close {
@@ -1654,8 +1709,36 @@ body {
     border-radius: 0.8rem;
 }
 
-.related-card img {
+.related-card__media {
+    position: relative;
     height: 180px;
+    overflow: hidden;
+}
+
+.related-card img {
+    height: 100%;
+}
+
+.related-card__img {
+    transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.related-card__img--base {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+}
+
+.related-card__img--hover {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    opacity: 0;
+}
+
+.related-card__img-placeholder {
+    height: 180px;
+    background: #f6f7f9;
 }
 
 .related-card__body p {
@@ -1683,6 +1766,18 @@ body {
 .related-card-link:hover .related-card {
     transform: scale(1.04);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.related-card:hover .related-card__img {
+    transform: scale(1.03);
+}
+
+.related-card:hover .related-card__img--base {
+    opacity: 0;
+}
+
+.related-card:hover .related-card__img--hover {
+    opacity: 1;
 }
 
 
