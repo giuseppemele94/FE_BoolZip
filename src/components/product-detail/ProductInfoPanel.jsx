@@ -4,6 +4,7 @@ function ProductInfoPanel({
     onDecrease,
     onIncrease,
     outOfStock,
+    onAddToCart,
 }) {
     // Prezzo in formato italiano: 64,00
     const numericPrice = Number(product.price);
@@ -71,7 +72,12 @@ function ProductInfoPanel({
                 </div>
             </div>
 
-            <button type="button" className="product-cta" disabled={outOfStock}>
+            <button
+                type="button"
+                className="product-cta"
+                disabled={outOfStock}
+                onClick={onAddToCart}
+            >
                 {outOfStock ? 'Esaurito' : 'Aggiungi al carrello'}
             </button>
 
@@ -95,7 +101,7 @@ function ProductInfoPanel({
 
             {productSizes.length > 0 && (
                 <>
-                    <p className="product-tax-note">Size</p>
+                    <p className="product-tax-note">Dimensione</p>
                     <ul className="product-features">
                         {productSizes.map((size) => (
                             <li key={size}>{size}</li>

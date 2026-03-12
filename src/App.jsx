@@ -7,6 +7,8 @@ import ProductDetailPage from "./pages/ProductDetailPage"
 import ProductsPage from "./pages/ProductsPage"
 //importo componente per gestire le rotte
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { CartProvider } from "./context/CartContext"
+import CartPage from "./pages/CartPage"
 
 const API_PRODUCTS_URL = "http://localhost:3000/api/products"
 
@@ -41,6 +43,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+      <CartProvider>
         <Routes>
           {/* Rotta padre: viene applicato default layout che conterrà sempre l'header, cioò che cambierà sarà il segnaposto outlet   */}
           <Route element={<DefaultLayout />}>
@@ -50,9 +53,11 @@ function App() {
             <Route path="/products" element={<ProductsPage products={products} />} />
             {/* Passaggio 4: rotta dinamica modello tramite slug. */}
             <Route path="/products/:slug" element={<ProductDetailPage products={products} />} />
+             <Route path="/cart" element={<CartPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
+        </CartProvider>
       </BrowserRouter>
     </>
   )
