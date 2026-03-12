@@ -13,12 +13,12 @@ function getProductImages(product) {
 
     const extraImages = Array.isArray(product?.product_images)
         ? product.product_images
-              .map((item) =>
-                  typeof item === 'string'
-                      ? item
-                      : item?.image_url || item?.url || ''
-              )
-              .filter(Boolean)
+            .map((item) =>
+                typeof item === 'string'
+                    ? item
+                    : item?.image_url || item?.url || ''
+            )
+            .filter(Boolean)
         : [];
 
     const allImages = [mainImage, ...extraImages].filter(Boolean);
@@ -96,12 +96,12 @@ function normalizeProduct(product) {
         sizes: getProductSizes(product),
         relatedProducts: Array.isArray(product.related_products)
             ? product.related_products
-                  .filter((item) => item && typeof item === 'object')
-                  .map((item) => ({
-                      ...item,
-                      id: item.id ?? item.slug,
-                      slug: String(item.slug ?? item.id ?? ''),
-                  }))
+                .filter((item) => item && typeof item === 'object')
+                .map((item) => ({
+                    ...item,
+                    id: item.id ?? item.slug,
+                    slug: String(item.slug ?? item.id ?? ''),
+                }))
             : [],
         features: Array.isArray(product.features) ? product.features : [],
     };
@@ -184,11 +184,11 @@ function ProductDetailPage() {
 
     const relatedProducts = Array.isArray(product.relatedProducts)
         ? product.relatedProducts.filter(
-              (item) =>
-                  item &&
-                  typeof item === 'object' &&
-                  String(item.slug || item.id) !== currentProductKey
-          )
+            (item) =>
+                item &&
+                typeof item === 'object' &&
+                String(item.slug || item.id) !== currentProductKey
+        )
         : [];
 
     const outOfStock = product.stock === 0;
@@ -216,8 +216,14 @@ function ProductDetailPage() {
     };
 
     // Aggiunge il prodotto al carrello con la quantità selezionata.
-    const handleAddToCart = () => {
-        addToCart(product, quantity);
+    const handleAddToCart = (event) => {
+        const sourceRect = event?.currentTarget?.getBoundingClientRect?.() || null;
+        const hoverImage = Array.isArray(product.images) ? product.images[1] || "" : "";
+
+        addToCart(product, quantity, {
+            sourceRect,
+            hoverImage,
+        });
     };
 
     return (

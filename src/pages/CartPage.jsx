@@ -29,7 +29,10 @@ function CartPage() {
     return (
         <section className="cart-page">
             <div className="cart-page__header">
-                <h1>Il tuo carrello</h1>
+                <div>
+                    <p className="cart-page__eyebrow">Rivedi il tuo ordine</p>
+                    <h1>Il tuo carrello</h1>
+                </div>
 
                 <button
                     type="button"
@@ -45,13 +48,35 @@ function CartPage() {
                     {cartItems.map((item) => (
                         <article key={item.product_id} className="cart-item">
                             {/* Immagine prodotto */}
-                            <div className="cart-item__media">
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
+                            <Link
+                                to={`/products/${item.slug || item.product_id}`}
+                                className="cart-item__product-link cart-item__product-link--media"
+                                aria-label={`Apri dettaglio prodotto ${item.name}`}
+                            >
+                                <div className="cart-item__media">
+                                    <img
+                                        src={item.image_url}
+                                        alt={item.name}
+                                        className={`cart-item__img ${item.hover_image_url ? "cart-item__img--base" : ""}`}
+                                    />
+                                    {item.hover_image_url && (
+                                        <img
+                                            src={item.hover_image_url}
+                                            alt={`${item.name} aperto e acceso`}
+                                            className="cart-item__img cart-item__img--hover"
+                                        />
+                                    )}
+                                </div>
+                            </Link>
 
                             {/* Info prodotto */}
                             <div className="cart-item__info">
-                                <h2>{item.name}</h2>
+                                <Link
+                                    to={`/products/${item.slug || item.product_id}`}
+                                    className="cart-item__product-link"
+                                >
+                                    <h2 className="cart-item__title">{item.name}</h2>
+                                </Link>
                                 <p className="cart-item__price">
                                     € {item.price.toFixed(2)}
                                 </p>
@@ -76,9 +101,12 @@ function CartPage() {
                                     </button>
                                 </div>
 
-                                <p className="cart-item__subtotal">
-                                    Subtotale: € {(item.price * item.quantity).toFixed(2)}
-                                </p>
+                                <div className="cart-item__subtotal-row">
+                                    <p className="cart-item__subtotal-label">Subtotale</p>
+                                    <p className="cart-item__subtotal">
+                                        € {(item.price * item.quantity).toFixed(2)}
+                                    </p>
+                                </div>
 
                                 <button
                                     type="button"
@@ -95,6 +123,7 @@ function CartPage() {
                 {/* Riepilogo ordine */}
                 <aside className="cart-summary">
                     <h2>Riepilogo</h2>
+                    <p className="cart-summary__hint">Consegna standard in 2-4 giorni lavorativi.</p>
 
                     <div className="cart-summary__row">
                         <span>Totale</span>
