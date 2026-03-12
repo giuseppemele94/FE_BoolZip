@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
 const API_PRODUCTS_URL = 'http://localhost:3000/api/products';
 const secondImageCache = new Map();
@@ -64,6 +65,7 @@ async function fetchSecondDetailImage(productKey) {
 
 function ProductListCard({ product }) {
     const { id, slug, name, price, image_url, image, images } = product;
+    const { addToCart } = useCart();
     const productSlug = String(slug || id || '');
     const fallbackCardImage = image_url || image || (Array.isArray(images) ? images[0] : '');
     const productImages = getProductImages(product);
@@ -112,6 +114,9 @@ function ProductListCard({ product }) {
         }).format(numericPrice)
         : '0,00';
 
+    const handleAddToCart = () => {
+        addToCart(product);
+    };
     return (
         <article className="catalog-card" onMouseEnter={handleCardHover}>
             <Link
@@ -145,7 +150,11 @@ function ProductListCard({ product }) {
                 </div>
             </Link>
 
-            <button className="catalog-card__cart-btn">
+            <button
+                type="button"
+                className="catalog-card__cart-btn"
+                onClick={handleAddToCart}
+            >
                 Aggiungi al carrello
             </button>
         </article>

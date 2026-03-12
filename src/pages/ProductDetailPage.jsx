@@ -4,6 +4,7 @@ import axios from 'axios';
 import ProductGallery from '../components/product-detail/ProductGallery';
 import ProductInfoPanel from '../components/product-detail/ProductInfoPanel';
 import RelatedProducts from '../components/product-detail/RelatedProducts';
+import { useCart } from '../context/CartContext';
 
 const API_PRODUCTS_URL = 'http://localhost:3000/api/products';
 
@@ -109,6 +110,9 @@ function normalizeProduct(product) {
 function ProductDetailPage() {
     const { slug } = useParams();
 
+    // Recupero dal context la funzione per aggiungere al carrello.
+    const { addToCart } = useCart();
+
     const [product, setProduct] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeImageByProduct, setActiveImageByProduct] = useState({});
@@ -158,7 +162,7 @@ function ProductDetailPage() {
         return (
             <section className="product-page product-page--fallback">
                 <h1>Prodotto non trovato</h1>
-                <p>Il prodotto richiesto non è stato trovato.</p>
+                <p>Il prodotto richiesto non è presente nel database.</p>
                 <Link to="/" className="product-back-link">
                     Torna alla home
                 </Link>
@@ -211,6 +215,11 @@ function ProductDetailPage() {
         });
     };
 
+    // Aggiunge il prodotto al carrello con la quantità selezionata.
+    const handleAddToCart = () => {
+        addToCart(product, quantity);
+    };
+
     return (
         <section className="product-page">
             <div className="product-detail">
@@ -226,6 +235,7 @@ function ProductDetailPage() {
                     onDecrease={decrement}
                     onIncrease={increment}
                     outOfStock={outOfStock}
+                    onAddToCart={handleAddToCart}
                 />
             </div>
 
