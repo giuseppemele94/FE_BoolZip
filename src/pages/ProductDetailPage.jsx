@@ -158,7 +158,7 @@ function ProductDetailPage() {
         return (
             <section className="product-page product-page--fallback">
                 <h1>Prodotto non trovato</h1>
-                <p>Il prodotto richiesto non è presente nel database.</p>
+                <p>Il prodotto richiesto non è stato trovato.</p>
                 <Link to="/" className="product-back-link">
                     Torna alla home
                 </Link>

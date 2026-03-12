@@ -388,7 +388,7 @@ body {
     border-radius: 50%;
     text-decoration: none;
     color: #1f2430;
-    background: rgba(255, 255, 255, 0.75);
+    
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1226,8 +1226,15 @@ body {
 .product-back-link {
     text-decoration: none;
     color: #fff;
-    background: #1f2430;
+    background: #d7192d;
 }
+
+.product-back-link:hover {
+    transform: translateY(-2px);
+    background-color: #e53a4d;
+}
+
+
 
 .catalog-card__cart-btn {
     width: calc(100% - 1.7rem);
@@ -1670,13 +1677,24 @@ body {
 }
 
 .product-page--fallback {
+    font-family: "Raleway", sans-serif;
     min-height: 55vh;
-    display: grid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     place-content: center;
     gap: 0.6rem;
 }
 
+.product-page--fallback h1,h2 {
+    font-family: "Erica One", sans-serif;
+}
+
+
+
 .product-back-link {
+
     width: fit-content;
     padding: 0.5rem 0.9rem;
     border-radius: 0.45rem;
