@@ -130,9 +130,9 @@ function CartPage() {
                         <strong>€ {cartTotal.toFixed(2)}</strong>
                     </div>
 
-                    <button type="button" className="cart-summary__checkout">
+                    <Link to ="/checkout" className="cart-summary__checkout">
                         Procedi al checkout
-                    </button>
+                    </Link>
                 </aside>
             </div>
         </section>

@@ -10,6 +10,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { CartProvider } from "./context/CartContext"
 import CartPage from "./pages/CartPage"
 
+import CheckoutPage from "./pages/CheckoutPage"
+
+
 const API_PRODUCTS_URL = "http://localhost:3000/api/products"
 
 function App() {
@@ -54,6 +57,8 @@ function App() {
             {/* Passaggio 4: rotta dinamica modello tramite slug. */}
             <Route path="/products/:slug" element={<ProductDetailPage products={products} />} />
              <Route path="/cart" element={<CartPage />} />
+             <Route path="/checkout" element={<CheckoutPage />} />
+
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
