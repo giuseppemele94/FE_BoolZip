@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 function CartPage() {
+    const [isClearAlertOpen, setIsClearAlertOpen] = useState(false);
+
     // Recupero dal context tutti i dati e le funzioni utili del carrello.
     const {
         cartItems,
@@ -11,6 +14,19 @@ function CartPage() {
         removeFromCart,
         clearCart,
     } = useCart();
+
+    function handleOpenClearAlert() {
+        setIsClearAlertOpen(true);
+    }
+
+    function handleCancelClearAlert() {
+        setIsClearAlertOpen(false);
+    }
+
+    function handleConfirmClearCart() {
+        clearCart();
+        setIsClearAlertOpen(false);
+    }
 
     // Se il carrello è vuoto, mostro uno stato empty.
     if (cartItems.length === 0) {
@@ -37,9 +53,9 @@ function CartPage() {
                 <button
                     type="button"
                     className="cart-page__clear-btn"
-                    onClick={clearCart}
+                    onClick={handleOpenClearAlert}
                 >
-                    Svuota carrello
+                    Pulisci carrello
                 </button>
             </div>
 
@@ -130,11 +146,48 @@ function CartPage() {
                         <strong>€ {cartTotal.toFixed(2)}</strong>
                     </div>
 
-                    <Link to ="/checkout" className="cart-summary__checkout">
+                    <Link to="/checkout" className="cart-summary__checkout">
                         Procedi al checkout
                     </Link>
                 </aside>
             </div>
+
+            {isClearAlertOpen && (
+                <div className="cart-clear-alert" role="dialog" aria-modal="true" aria-labelledby="cart-clear-alert-title">
+                    <button
+                        type="button"
+                        className="cart-clear-alert__overlay"
+                        aria-label="Chiudi conferma"
+                        onClick={handleCancelClearAlert}
+                    ></button>
+
+                    <div className="cart-clear-alert__card">
+                        <p className="cart-clear-alert__eyebrow">Attenzione</p>
+                        <h2 id="cart-clear-alert-title">Vuoi davvero pulire il carrello?</h2>
+                        <p>
+                            Tutti i prodotti verranno rimossi. Questa azione non puo essere annullata.
+                        </p>
+
+                        <div className="cart-clear-alert__actions">
+                            <button
+                                type="button"
+                                className="cart-clear-alert__btn cart-clear-alert__btn--ghost"
+                                onClick={handleCancelClearAlert}
+                            >
+                                Annulla
+                            </button>
+
+                            <button
+                                type="button"
+                                className="cart-clear-alert__btn cart-clear-alert__btn--danger"
+                                onClick={handleConfirmClearCart}
+                            >
+                                Conferma
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

@@ -81,6 +81,10 @@ function MainHeader() {
     return (
         // Aggiungo una classe dinamica se l'utente ha scrollato la pagina.
         <>
+            <div className="site-shipping-bar" role="status" aria-live="polite">
+                Spedizione gratuita per ordini superiori a € 69,99
+            </div>
+
             <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
                 <div className="site-header__inner">
 
