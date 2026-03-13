@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 
 function CartDrawer({ isOpen, onClose }) {
+    const [isClearAlertOpen, setIsClearAlertOpen] = useState(false);
+
     const {
         cartItems,
         cartTotal,
@@ -11,6 +13,19 @@ function CartDrawer({ isOpen, onClose }) {
         removeFromCart,
         clearCart,
     } = useCart();
+
+    function handleOpenClearAlert() {
+        setIsClearAlertOpen(true);
+    }
+
+    function handleCancelClearAlert() {
+        setIsClearAlertOpen(false);
+    }
+
+    function handleConfirmClearCart() {
+        clearCart();
+        setIsClearAlertOpen(false);
+    }
 
     useEffect(() => {
         if (!isOpen) {
@@ -33,6 +48,12 @@ function CartDrawer({ isOpen, onClose }) {
             window.removeEventListener("keydown", handleEscape);
         };
     }, [isOpen, onClose]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setIsClearAlertOpen(false);
+        }
+    }, [isOpen]);
 
     const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -154,7 +175,7 @@ function CartDrawer({ isOpen, onClose }) {
                                 <button
                                     type="button"
                                     className="cart-drawer__ghost"
-                                    onClick={clearCart}
+                                    onClick={handleOpenClearAlert}
                                 >
                                     Svuota carrello
                                 </button>
@@ -163,6 +184,43 @@ function CartDrawer({ isOpen, onClose }) {
                     </>
                 )}
             </aside>
+
+            {isOpen && isClearAlertOpen && (
+                <div className="cart-clear-alert" role="dialog" aria-modal="true" aria-labelledby="drawer-clear-alert-title">
+                    <button
+                        type="button"
+                        className="cart-clear-alert__overlay"
+                        aria-label="Chiudi conferma"
+                        onClick={handleCancelClearAlert}
+                    ></button>
+
+                    <div className="cart-clear-alert__card">
+                        <p className="cart-clear-alert__eyebrow">Attenzione</p>
+                        <h2 id="drawer-clear-alert-title">Vuoi davvero pulire il carrello?</h2>
+                        <p>
+                            Tutti i prodotti verranno rimossi. Questa azione non puo essere annullata.
+                        </p>
+
+                        <div className="cart-clear-alert__actions">
+                            <button
+                                type="button"
+                                className="cart-clear-alert__btn cart-clear-alert__btn--ghost"
+                                onClick={handleCancelClearAlert}
+                            >
+                                Annulla
+                            </button>
+
+                            <button
+                                type="button"
+                                className="cart-clear-alert__btn cart-clear-alert__btn--danger"
+                                onClick={handleConfirmClearCart}
+                            >
+                                Conferma
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
