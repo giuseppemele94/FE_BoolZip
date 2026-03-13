@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductListCard from "./products/ProductListCard";
 import ProductPriceFilter from "./products/ProductPriceFilter";
+import ProductSearchBar from "./products/ProductSearchBar";
 
 function ProductList({
     products,
@@ -23,12 +24,17 @@ function ProductList({
     onSizeChange = () => { },
 }) {
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+    const [searchDraft, setSearchDraft] = useState(searchTerm);
     const [openFilterSections, setOpenFilterSections] = useState({
         price: true,
         category: true,
         material: false,
         size: false,
     });
+
+    useEffect(() => {
+        setSearchDraft(searchTerm);
+    }, [searchTerm]);
 
     const visibleProducts = useMemo(() => {
         const safeProducts = Array.isArray(products) ? [...products] : [];
@@ -79,11 +85,16 @@ function ProductList({
 
     function resetFilters() {
         onSearchChange("");
+        setSearchDraft("");
         onMinPriceChange("");
         onMaxPriceChange("");
         onSizeChange("");
         onCategoryChange("");
         onMaterialChange("");
+    }
+
+    function handleSearchSubmit(value) {
+        onSearchChange(value);
     }
 
     function toggleFilterSection(sectionName) {
@@ -182,23 +193,45 @@ function ProductList({
                     {eyebrow && <p className="catalog__eyebrow">{eyebrow}</p>}
                     {title && <h2 id="catalog-title">{title}</h2>}
                     {description && <p className="catalog__description">{description}</p>}
-
-                    {showFilters && searchTerm.trim() !== "" && (
-                        <div className="catalog__search-context">
-                            <span>
-                                Risultati per <strong>{searchTerm}</strong>
-                            </span>
-
-                            <button
-                                type="button"
-                                className="catalog__search-clear"
-                                onClick={() => onSearchChange("")}
-                            >
-                                Rimuovi ricerca
-                            </button>
-                        </div>
-                    )}
                 </div>
+
+                {showFilters && (
+                    <div className="catalog__search-wrap">
+                        <ProductSearchBar
+                            value={searchDraft}
+                            onChange={setSearchDraft}
+                            totalCount={productsToRender.length}
+                            visibleCount={productsToRender.length}
+                            onSubmit={handleSearchSubmit}
+                            submitLabel="Cerca"
+                            variant="compact"
+                            showStats={false}
+                            inputId="products-catalog-search"
+                            eyebrow="Ricerca rapida"
+                            title="Cerca nel catalogo"
+                            placeholder="Cerca per nome, stile o finitura"
+                        />
+
+                        {searchTerm.trim() !== "" && (
+                            <div className="catalog__search-context">
+                                <span>
+                                    Risultati per <strong>{searchTerm}</strong>
+                                </span>
+
+                                <button
+                                    type="button"
+                                    className="catalog__search-clear"
+                                    onClick={() => {
+                                        onSearchChange("");
+                                        setSearchDraft("");
+                                    }}
+                                >
+                                    Cancella ricerca
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {showFilters ? (
