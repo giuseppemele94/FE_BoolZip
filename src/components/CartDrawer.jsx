@@ -67,7 +67,7 @@ function CartDrawer({ isOpen, onClose }) {
 
                 {cartItems.length === 0 ? (
                     <div className="cart-drawer__empty">
-                        <p>Il carrello e vuoto. Aggiungi un prodotto per iniziare.</p>
+                        <p>Il carrello è vuoto. Aggiungi un prodotto per iniziare.</p>
                         <Link to="/products" className="cart-drawer__link" onClick={onClose}>
                             Vai ai prodotti
                         </Link>
