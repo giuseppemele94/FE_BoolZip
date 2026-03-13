@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import ProductListCard from "./products/ProductListCard";
-import ProductSearchBar from "./products/ProductSearchBar";
 import ProductPriceFilter from "./products/ProductPriceFilter";
 
 function ProductList({
@@ -23,7 +22,6 @@ function ProductList({
     selectedSize = "",
     onSizeChange = () => { },
 }) {
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     const [openFilterSections, setOpenFilterSections] = useState({
         price: true,
@@ -78,8 +76,6 @@ function ProductList({
         selectedMaterial,
         selectedSize,
     ].filter((value) => value !== "").length;
-
-    const hasActiveSearch = searchTerm.trim() !== "";
 
     function resetFilters() {
         onSearchChange("");
@@ -186,38 +182,23 @@ function ProductList({
                     {eyebrow && <p className="catalog__eyebrow">{eyebrow}</p>}
                     {title && <h2 id="catalog-title">{title}</h2>}
                     {description && <p className="catalog__description">{description}</p>}
-                </div>
 
-                {showFilters && (
-                    <div className="catalog__search-wrap">
-                        <button
-                            type="button"
-                            className={`catalog__search-toggle ${isSearchOpen ? "is-open" : ""}`}
-                            aria-expanded={isSearchOpen}
-                            aria-controls="catalog-search-panel"
-                            onClick={() => setIsSearchOpen((currentValue) => !currentValue)}
-                        >
-                            <span className="catalog__toggle-copy">
-                                <i className="bi bi-search" aria-hidden="true"></i>
-                                <span>{isSearchOpen ? "Chiudi ricerca" : "Apri ricerca"}</span>
+                    {showFilters && searchTerm.trim() !== "" && (
+                        <div className="catalog__search-context">
+                            <span>
+                                Risultati per <strong>{searchTerm}</strong>
                             </span>
 
-                            {hasActiveSearch && <span className="catalog__toggle-count">1</span>}
-                        </button>
-
-                        <div
-                            id="catalog-search-panel"
-                            className={`catalog__search-panel ${isSearchOpen ? "is-open" : ""}`}
-                        >
-                            <ProductSearchBar
-                                value={searchTerm}
-                                onChange={onSearchChange}
-                                totalCount={visibleProducts.length}
-                                visibleCount={productsToRender.length}
-                            />
+                            <button
+                                type="button"
+                                className="catalog__search-clear"
+                                onClick={() => onSearchChange("")}
+                            >
+                                Rimuovi ricerca
+                            </button>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
             {showFilters ? (
