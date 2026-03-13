@@ -83,6 +83,16 @@ function CheckoutPage() {
         return Number(cartTotal).toFixed(2);
     }, [cartTotal]);
 
+    // Spedizione gratuita oltre 70€ (sul totale scontato), altrimenti 3,99€
+    const shippingCost = useMemo(() => {
+        return Number(discountedTotal) >= 70 ? 0 : 3.99;
+    }, [discountedTotal]);
+
+    // Totale finale comprensivo di spedizione
+    const finalTotal = useMemo(() => {
+        return (Number(discountedTotal) + shippingCost).toFixed(2);
+    }, [discountedTotal, shippingCost]);
+
     // Funzione generica per aggiornare i campi del form
     function handleChange(e) {
         const { name, value } = e.target;
@@ -486,9 +496,14 @@ function CheckoutPage() {
                             </div>
                         )}
 
+                        <div className={`checkout-summary__row${shippingCost === 0 ? " checkout-summary__row--shipping-free" : ""}`}>
+                            <span>Spedizione</span>
+                            <span>{shippingCost === 0 ? "Gratuita" : `€ ${shippingCost.toFixed(2)}`}</span>
+                        </div>
+
                         <div className="checkout-summary__total">
                             <span>Totale</span>
-                            <strong>€ {discountedTotal}</strong>
+                            <strong>€ {finalTotal}</strong>
                         </div>
                     </div>
                 </aside>
