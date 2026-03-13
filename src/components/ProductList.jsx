@@ -41,22 +41,22 @@ function ProductList({
     }, [products, limit]);
 
     const categoryOptions = [
-        { id: "1", label: "Classic" },
-        { id: "2", label: "Electric" },
+        { value: "Accendini", label: "Accendini" },
+        { value: "Accessori", label: "Accessori" },
     ];
 
     const materialOptions = [
-        { id: "1", label: "Brass" },
-        { id: "2", label: "Chrome" },
-        { id: "3", label: "Matte Black Steel" },
-        { id: "4", label: "Copper" },
-        { id: "5", label: "Titanium" },
-        { id: "6", label: "Gold Plated" },
+        { value: "Brass", label: "Brass" },
+        { value: "Chrome", label: "Chrome" },
+        { value: "Matte Black Steel", label: "Matte Black Steel" },
+        { value: "Copper", label: "Copper" },
+        { value: "Titanium", label: "Titanium" },
+        { value: "Gold Plated", label: "Gold Plated" },
     ];
 
     const sizeOptions = [
-        { id: "1", label: "Slim" },
-        { id: "2", label: "Standard" },
+        { value: "Slim", label: "Slim" },
+        { value: "Standard", label: "Standard" },
     ];
 
     const productsToRender = useMemo(() => visibleProducts, [visibleProducts]);
@@ -104,7 +104,7 @@ function ProductList({
         emptyLabel,
     }) {
         const isOpen = openFilterSections[sectionName];
-        const activeOption = options.find((option) => option.id === value);
+        const activeOption = options.find((option) => option.value === value);
 
         return (
             <div className={`catalog-filters__group ${isOpen ? "is-open" : ""}`}>
@@ -152,7 +152,7 @@ function ProductList({
                         >
                             <option value="">{emptyLabel}</option>
                             {options.map((option) => (
-                                <option key={option.id} value={option.id}>
+                                <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
