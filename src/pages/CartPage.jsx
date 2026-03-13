@@ -165,7 +165,7 @@ function CartPage() {
                         <p className="cart-clear-alert__eyebrow">Attenzione</p>
                         <h2 id="cart-clear-alert-title">Vuoi davvero pulire il carrello?</h2>
                         <p>
-                            Tutti i prodotti verranno rimossi. Questa azione non puo essere annullata.
+                            Tutti i prodotti verranno rimossi. Questa azione non può essere annullata.
                         </p>
 
                         <div className="cart-clear-alert__actions">
