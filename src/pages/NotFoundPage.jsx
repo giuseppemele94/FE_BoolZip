@@ -1,6 +1,14 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function NotFoundPage() {
+    useEffect(() => {
+        document.body.classList.add("body--logo-background");
+
+        return () => {
+            document.body.classList.remove("body--logo-background");
+        };
+    }, []);
 
     return (
         <div className="product-page product-page--fallback">

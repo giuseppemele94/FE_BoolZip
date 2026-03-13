@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import ProductList from "../components/ProductList";
 
 const API_PRODUCTS_URL = "http://localhost:3000/api/products";
 
 function ProductsPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [minPrice, setMinPrice] = useState("");
@@ -12,6 +14,24 @@ function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedMaterial, setSelectedMaterial] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
+
+    useEffect(() => {
+        setSearchTerm(searchParams.get("search")?.trim() || "");
+    }, [searchParams]);
+
+    function handleSearchChange(value) {
+        const trimmedValue = value.trim();
+        const nextSearchParams = new URLSearchParams(searchParams);
+
+        if (trimmedValue) {
+            nextSearchParams.set("search", trimmedValue);
+        } else {
+            nextSearchParams.delete("search");
+        }
+
+        setSearchTerm(value);
+        setSearchParams(nextSearchParams, { replace: true });
+    }
 
     useEffect(() => {
         const params = {};
@@ -56,7 +76,7 @@ function ProductsPage() {
             description="Gli accendini Zippo sono resistenti, ricaricabili e costruiti per durare tutta la vita. Trova l'accendino perfetto per te!"
             showFilters
             searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             minPrice={minPrice}
             maxPrice={maxPrice}
             onMinPriceChange={setMinPrice}

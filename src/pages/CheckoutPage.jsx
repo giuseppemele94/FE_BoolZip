@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
@@ -7,6 +7,9 @@ import { useCart } from "../context/CartContext";
 const API_BASE_URL = "http://localhost:3000/api/orders";
 
 function CheckoutPage() {
+    const bodyLogoClassName = "body--logo-background";
+    const termsAcceptanceError = "Devi accettare i termini e condizioni per completare l'ordine.";
+
     // Recupero dal context:
     // - i prodotti nel carrello
     // - il totale base del carrello
@@ -32,6 +35,10 @@ function CheckoutPage() {
     // Messaggio legato al coupon:
     // ad esempio "coupon applicato" oppure errore sul coupon
     const [couponMessage, setCouponMessage] = useState("");
+    const [couponStatus, setCouponStatus] = useState("idle");
+
+    const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
 
     // Stato di caricamento durante la conferma dell'ordine
     const [loading, setLoading] = useState(false);
@@ -44,6 +51,22 @@ function CheckoutPage() {
 
     // Verifico se il carrello è vuoto
     const isCartEmpty = cartItems.length === 0;
+
+    useEffect(() => {
+        if (successMessage) {
+            document.body.classList.add(bodyLogoClassName);
+
+            return () => {
+                document.body.classList.remove(bodyLogoClassName);
+            };
+        }
+
+        document.body.classList.remove(bodyLogoClassName);
+
+        return () => {
+            document.body.classList.remove(bodyLogoClassName);
+        };
+    }, [successMessage]);
 
     /*
       Calcolo del totale scontato mostrato nel riepilogo.
@@ -63,6 +86,12 @@ function CheckoutPage() {
     // Funzione generica per aggiornare i campi del form
     function handleChange(e) {
         const { name, value } = e.target;
+
+        if (name === "discount_code") {
+            setCouponMessage("");
+            setCouponStatus("idle");
+            setAppliedDiscount(0);
+        }
 
         setFormData((prev) => ({
             ...prev,
@@ -84,6 +113,12 @@ function CheckoutPage() {
         // Blocco di sicurezza: se il carrello è vuoto non procedo
         if (isCartEmpty) {
             setErrorMessage("Il carrello è vuoto.");
+            return;
+        }
+
+        if (!hasAcceptedTerms) {
+            setErrorMessage(termsAcceptanceError);
+            setIsTermsOpen(true);
             return;
         }
 
@@ -196,6 +231,7 @@ function CheckoutPage() {
         // Se il campo è vuoto mostro subito un messaggio
         if (!code) {
             setCouponMessage("Inserisci un codice sconto.");
+            setCouponStatus("error");
             setAppliedDiscount(0);
             return;
         }
@@ -210,17 +246,20 @@ function CheckoutPage() {
                 // Se il coupon è valido salvo il valore dello sconto
                 setAppliedDiscount(Number(response.data.discount) || 0);
                 setCouponMessage("Coupon applicato con successo.");
+                setCouponStatus("success");
                 setErrorMessage("");
             } else {
                 // Se non è valido, resetto sconto e mostro il messaggio ricevuto
                 setAppliedDiscount(0);
                 setCouponMessage(response.data.message || "Coupon non valido.");
+                setCouponStatus("error");
             }
         } catch (error) {
             console.error(error);
 
             // In caso di errore backend o di rete
             setAppliedDiscount(0);
+            setCouponStatus("error");
             setCouponMessage(
                 error.response?.data?.message || "Errore nella verifica del coupon."
             );
@@ -346,10 +385,55 @@ function CheckoutPage() {
 
                         {/* Messaggio legato al coupon */}
                         {couponMessage && (
-                            <p className="checkout-form__message checkout-form__message--success">
+                            <p
+                                className={`checkout-form__message checkout-form__message--${couponStatus === "error" ? "error" : "success"}`}
+                            >
                                 {couponMessage}
                             </p>
                         )}
+
+                        <div className="checkout-form__field checkout-form__field--full">
+                            <div className="checkout-form__terms-row">
+                                <label className="checkout-form__checkbox" htmlFor="accept_terms">
+                                    <input
+                                        id="accept_terms"
+                                        type="checkbox"
+                                        checked={hasAcceptedTerms}
+                                        onChange={(event) => {
+                                            setHasAcceptedTerms(event.target.checked);
+
+                                            if (errorMessage === termsAcceptanceError) {
+                                                setErrorMessage("");
+                                            }
+                                        }}
+                                    />
+                                    <span>Accetto i</span>
+                                </label>
+
+                                <button
+                                    type="button"
+                                    className="checkout-form__terms-link"
+                                    aria-expanded={isTermsOpen}
+                                    aria-controls="checkout-terms-panel"
+                                    onClick={() => setIsTermsOpen((currentValue) => !currentValue)}
+                                >
+                                    termini e condizioni
+                                </button>
+                            </div>
+
+                            {isTermsOpen && (
+                                <div id="checkout-terms-panel" className="checkout-form__terms-panel">
+                                    <p>
+                                        L&apos;ordine viene elaborato solo dopo la verifica dei dati inseriti,
+                                        della disponibilita dei prodotti e della conferma del pagamento.
+                                    </p>
+                                    <p>
+                                        Procedendo accetti le condizioni di vendita, i tempi di consegna e il
+                                        trattamento dei dati necessario alla gestione dell&apos;ordine.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Pulsante finale di conferma ordine */}

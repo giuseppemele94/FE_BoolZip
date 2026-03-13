@@ -24,6 +24,9 @@ body {
     color: var(--ink);
     overflow-x: hidden;
     background-color: #fff;
+}
+
+body.body--logo-background {
     background-image:
         linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.86) 100%),
         url("/images/logoBZ.png");
@@ -31,7 +34,6 @@ body {
     background-position: center center, center center;
     background-size: 100% 100%, 112vw auto;
     background-attachment: fixed, fixed;
-
 }
 
 .app-shell {
@@ -606,6 +608,28 @@ body {
     flex: 1;
 }
 
+.catalog__search-context {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid #ddd6ca;
+    color: #4b5361;
+    font-size: 0.92rem;
+}
+
+.catalog__search-clear {
+    border: none;
+    background: transparent;
+    color: #d7192d;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .catalog__search-wrap {
     width: min(390px, 100%);
     margin-left: auto;
@@ -821,6 +845,13 @@ body {
     box-shadow: 0 16px 32px rgba(31, 36, 48, 0.08);
 }
 
+.catalog-controls--compact {
+    gap: 0.55rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 0.9rem;
+    box-shadow: 0 12px 22px rgba(31, 36, 48, 0.06);
+}
+
 .catalog-controls__header {
     display: flex;
     align-items: flex-start;
@@ -861,6 +892,10 @@ body {
     position: relative;
 }
 
+.catalog-controls__field--action .catalog-controls__input {
+    padding-right: 5.6rem;
+}
+
 .catalog-controls__field-icon {
     position: absolute;
     left: 0.95rem;
@@ -894,6 +929,50 @@ body {
     font-size: 0.85rem;
     color: #5f6673;
     font-weight: 600;
+}
+
+.catalog-controls__submit {
+    position: absolute;
+    top: 50%;
+    right: 0.35rem;
+    transform: translateY(-50%);
+    border: none;
+    border-radius: 0.58rem;
+    padding: 0.6rem 0.9rem;
+    background: #d7192d;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.home-search-shell {
+    width: min(860px, 90%);
+    margin: 0 auto 2rem;
+    padding: 0.1rem 0 0;
+    display: grid;
+    gap: 0.8rem;
+}
+
+.home-search-shell__copy {
+    display: grid;
+    gap: 0.3rem;
+    justify-items: center;
+    text-align: center;
+}
+
+.home-search-shell__copy p {
+    margin: 0;
+    color: #8a5d2e;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.home-search-shell__copy h2 {
+    margin: 0;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    color: #2a3140;
 }
 
 .catalog-filters {
@@ -2774,6 +2853,58 @@ h2 {
     background: #ecfdf3;
     color: #027a48;
     border: 1px solid #abefc6;
+}
+
+.checkout-form__terms-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.checkout-form__checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #273041;
+}
+
+.checkout-form__checkbox input {
+    width: 18px;
+    height: 18px;
+    accent-color: #d7192d;
+}
+
+.checkout-form__terms-link {
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: #d7192d;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.checkout-form__terms-panel {
+    margin-top: 0.8rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid #f2c9ce;
+    border-radius: 0.82rem;
+    background: #fff7f8;
+    color: #4f5a6b;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.checkout-form__terms-panel p {
+    margin: 0;
+}
+
+.checkout-form__terms-panel p+p {
+    margin-top: 0.55rem;
 }
 
 .checkout-form__coupon-row {
