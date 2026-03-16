@@ -9,8 +9,9 @@ import ProductsPage from "./pages/ProductsPage"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { CartProvider } from "./context/CartContext"
 import CartPage from "./pages/CartPage"
-
+import WishlistPage from "./pages/WishlistPage"
 import CheckoutPage from "./pages/CheckoutPage"
+import { WishlistProvider } from "./context/WishlistContext"
 
 
 const API_PRODUCTS_URL = "http://localhost:3000/api/products"
@@ -46,22 +47,24 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <CartProvider>
-        <Routes>
-          {/* Rotta padre: viene applicato default layout che conterrà sempre l'header, cioò che cambierà sarà il segnaposto outlet   */}
-          <Route element={<DefaultLayout />}>
-            {/* Route index: quando l'URL è "/" renderizza HomePage dentro il layout */}
-            <Route index element={<HomePage products={products} />} />
-            {/* Pagina prodotti: mostra il listato card, non il dettaglio singolo. */}
-            <Route path="/products" element={<ProductsPage products={products} />} />
-            {/* Passaggio 4: rotta dinamica modello tramite slug. */}
-            <Route path="/products/:slug" element={<ProductDetailPage products={products} />} />
-             <Route path="/cart" element={<CartPage />} />
-             <Route path="/checkout" element={<CheckoutPage />} />
-
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
+        <CartProvider>
+          <WishlistProvider>
+            <Routes>
+              {/* Rotta padre: viene applicato default layout che conterrà sempre l'header, cioò che cambierà sarà il segnaposto outlet   */}
+              <Route element={<DefaultLayout />}>
+                {/* Route index: quando l'URL è "/" renderizza HomePage dentro il layout */}
+                <Route index element={<HomePage products={products} />} />
+                {/* Pagina prodotti: mostra il listato card, non il dettaglio singolo. */}
+                <Route path="/products" element={<ProductsPage products={products} />} />
+                {/* Passaggio 4: rotta dinamica modello tramite slug. */}
+                <Route path="/products/:slug" element={<ProductDetailPage products={products} />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Routes>
+          </ WishlistProvider>
         </CartProvider>
       </BrowserRouter>
     </>

@@ -52,7 +52,11 @@ function NewsletterPopup() {
             }, 1500);
         } catch (error) {
             console.error(error);
-            setMessage("Si è verificato un errore. Riprova.");
+
+            const backendMessage =
+                error.response?.data?.message || "Si è verificato un errore. Riprova.";
+
+            setMessage(backendMessage);
             setIsSuccess(false);
         } finally {
             setLoading(false);
@@ -101,9 +105,8 @@ function NewsletterPopup() {
 
                 {message && (
                     <p
-                        className={`newsletter-popup__message ${
-                            isSuccess ? "is-success" : "is-error"
-                        }`}
+                        className={`newsletter-popup__message ${isSuccess ? "is-success" : "is-error"
+                            }`}
                     >
                         {message}
                     </p>

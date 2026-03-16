@@ -5,6 +5,7 @@ import ProductGallery from '../components/product-detail/ProductGallery';
 import ProductInfoPanel from '../components/product-detail/ProductInfoPanel';
 import RelatedProducts from '../components/product-detail/RelatedProducts';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const API_PRODUCTS_URL = 'http://localhost:3000/api/products';
 
@@ -112,7 +113,7 @@ function ProductDetailPage() {
 
     // Recupero dal context la funzione per aggiungere al carrello.
     const { addToCart } = useCart();
-
+    const { toggleWishlist, isInWishlist } = useWishlist();
     const [product, setProduct] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeImageByProduct, setActiveImageByProduct] = useState({});
@@ -171,6 +172,7 @@ function ProductDetailPage() {
     }
 
     const currentProductKey = String(product.slug || product.id);
+    const isWishlisted = isInWishlist(product.id ?? product.slug);
     const activeImage =
         activeImageByProduct[currentProductKey] || product.images[0] || '';
     const quantity = quantityByProduct[currentProductKey] ?? 1;
@@ -235,14 +237,27 @@ function ProductDetailPage() {
                     onSelectImage={handleSelectImage}
                 />
 
-                <ProductInfoPanel
-                    product={product}
-                    quantity={quantity}
-                    onDecrease={decrement}
-                    onIncrease={increment}
-                    outOfStock={outOfStock}
-                    onAddToCart={handleAddToCart}
-                />
+                <div className="product-detail__side">
+                    <button
+                        type="button"
+                        className={`product-detail__wishlist-btn ${isWishlisted ? "is-active" : ""}`}
+                        onClick={() => toggleWishlist(product)}
+                        aria-label={isWishlisted ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+                    >
+                        <i className={`bi ${isWishlisted ? "bi-heart-fill" : "bi-heart"}`}></i>
+                        <span>{isWishlisted ? "Salvato" : "Aggiungi ai preferiti"}</span>
+                    </button>
+
+                    <ProductInfoPanel
+                        product={product}
+                        quantity={quantity}
+                        onDecrease={decrement}
+                        onIncrease={increment}
+                        outOfStock={outOfStock}
+                        onAddToCart={handleAddToCart}
+                    />
+                </div>
+                
             </div>
 
             <RelatedProducts products={relatedProducts} />

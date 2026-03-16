@@ -1,6 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 function MainHeader() {
     // Stato che serve per capire se la pagina è stata scrollata,
@@ -8,8 +9,9 @@ function MainHeader() {
     const [scrolled, setScrolled] = useState(false);
     const [flyItems, setFlyItems] = useState([]);
     const [isCartPulseActive, setIsCartPulseActive] = useState(false);
-     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const cartButtonRef = useRef(null);
+    const { wishlistCount } = useWishlist();
 
     // Recupero dal context il numero totale di prodotti nel carrello.
     const { cartCount, toggleCartDrawer } = useCart();
@@ -79,7 +81,7 @@ function MainHeader() {
         toggleCartDrawer();
     };
 
-     const toggleMobileMenu = () => {
+    const toggleMobileMenu = () => {
         setIsMobileMenuOpen((prev) => !prev);
     };
 
@@ -138,6 +140,20 @@ function MainHeader() {
                             )}
                         </button>
 
+
+                        {/* Pulsante wishlist */}
+                        <Link
+                            to="/wishlist"
+                            className="site-header__icon-btn site-header__wishlist-btn"
+                            aria-label="Preferiti"
+                        >
+                            <i className="bi bi-heart"></i>
+
+                            {wishlistCount > 0 && (
+                                <span className="site-header__cart-count">{wishlistCount}</span>
+                            )}
+                        </Link>
+
                         {/* Pulsante login visibile nella versione desktop */}
                         <Link
                             to="/login"
@@ -148,7 +164,7 @@ function MainHeader() {
                         </Link>
 
                         {/* Bottone hamburger per il menu mobile */}
-                         <button
+                        <button
                             type="button"
                             className="site-header__menu-toggle"
                             aria-label={isMobileMenuOpen ? "Chiudi menu" : "Apri menu"}

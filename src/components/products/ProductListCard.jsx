@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 
 const API_PRODUCTS_URL = 'http://localhost:3000/api/products';
 const secondImageCache = new Map();
@@ -64,7 +65,11 @@ async function fetchSecondDetailImage(productKey) {
 }
 
 function ProductListCard({ product }) {
+    
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    
     const { id, slug, name, price, image_url, image, images } = product;
+    const isWishlisted = isInWishlist(id ?? slug);
     const { addToCart } = useCart();
     const productSlug = String(slug || id || '');
     const fallbackCardImage = image_url || image || (Array.isArray(images) ? images[0] : '');
@@ -133,6 +138,14 @@ function ProductListCard({ product }) {
     };
     return (
         <article className="catalog-card" onMouseEnter={handleCardHover}>
+            <button
+                type="button"
+                className={`catalog-card__wishlist-btn ${isWishlisted ? "is-active" : ""}`}
+                onClick={() => toggleWishlist(product)}
+                aria-label={isWishlisted ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+            >
+                <i className={`bi ${isWishlisted ? "bi-heart-fill" : "bi-heart"}`}></i>
+            </button>
             <Link
                 to={`/products/${productSlug}`}
                 className="catalog-card-link"
