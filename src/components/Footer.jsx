@@ -13,9 +13,7 @@ function Footer() {
                             alt="BoolZip"
                             className="footer-logo"
                         />
-                        <p>
-                            Design metallico, apertura precisa e finiture premium per uso quotidiano o collezione.
-                        </p>
+                      
                     </div>
 
                     <div className="footer-links">

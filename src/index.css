@@ -184,7 +184,7 @@ body.body--logo-background {
     font-family: "Erica One", sans-serif;
     font-weight: 400;
     /* bold */
-    font-size: clamp(2.4rem, 5.8vw, 4.1rem);
+    font-size: clamp(2.4rem, 5.8vw, 3.4rem);
     line-height: .95;
 
 
@@ -493,7 +493,7 @@ body.body--logo-background {
 .site-header__cart-btn {
     position: relative;
     background: #fff;
-    box-shadow: 0 4px 16px rgba(26, 27, 31, 0.12);
+   box-shadow: 0 4px 16px rgba(26, 27, 31, 0.12);
 }
 
 .site-header__cart-btn.is-pulse {
@@ -1843,7 +1843,8 @@ body.body--logo-background {
     font-family: "Raleway", sans-serif;
     margin: 0.5rem 0 0;
     font-size: 0.86rem;
-    color: #6a717b;
+    color: #111111;
+    font-weight: 600;
 }
 
 .product-tax-note a,
@@ -1854,6 +1855,7 @@ body.body--logo-background {
 .qty-wrap {
     margin-top: 0.95rem;
     font-family: "Raleway", sans-serif;
+    font-weight: 700;
 }
 
 .qty-wrap p {
@@ -1904,7 +1906,7 @@ body.body--logo-background {
     margin-top: 0.8rem;
     border: 0;
     background: transparent;
-    padding: 0;
+    padding-left: 15px;
 }
 
 .product-description,
@@ -2139,6 +2141,58 @@ h2 {
 
     .footer-top {
         grid-template-columns: 1fr;
+    }
+
+    .footer-container {
+        text-align: center;
+    }
+
+    .footer-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-logo {
+        display: block;
+        margin: 0 auto 1rem;
+    }
+
+    .footer-brand p {
+        text-align: center;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 1024px) {
+    .site-footer {
+        padding: 2.5rem 0 1.2rem;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-container {
+        text-align: center;
+    }
+
+    .footer-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-logo {
+        display: block;
+        margin: 0 auto 1rem;
+    }
+
+    .footer-brand p {
+        text-align: center;
+        margin: 0 auto;
     }
 }
 
@@ -3280,3 +3334,55 @@ h2 {
         height: 84px;
     }
 }
+
+
+/*MOBILE MENU*/
+
+.mobile-menu {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        width: 92%;
+        margin: 0 auto;
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-10px);
+        transition: max-height 0.28s ease, opacity 0.22s ease, transform 0.22s ease, padding 0.22s ease;
+    }
+
+    .mobile-menu.is-open {
+        max-height: 320px;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+        padding: 0.6rem 0 1rem;
+    }
+
+    .mobile-menu__link {
+        text-align: center;
+        text-decoration: none;
+        color: #1f2430;
+        font-family: "Raleway", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        padding: 0.95rem 1rem;
+        border-radius: 0.8rem;
+        
+        
+    }
+
+    .mobile-menu__link.active {
+        color: #d7192d;
+    }
+}
+
+
+

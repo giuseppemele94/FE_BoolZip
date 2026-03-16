@@ -60,7 +60,7 @@ function ProductInfoPanel({
             </p>
 
             <div className="qty-wrap">
-                <p>Quantita</p>
+                <p>Quantità</p>
                 <div className="qty-box">
                     <button type="button" onClick={onDecrease} aria-label="Diminuisci quantita">
                         -
