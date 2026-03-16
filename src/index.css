@@ -417,6 +417,9 @@ body.body--logo-background {
     transition: color 0.18s ease;
 }
 
+ .site-header__wishlist-btn .bi-heart {
+        font-size: 1.50rem;
+    }
 .site-header__link:hover {
     color: var(--accent);
 }
@@ -449,7 +452,7 @@ body.body--logo-background {
 .site-header__menu-toggle {
     width: 44px;
     height: 44px;
-    background-color:transparent;
+    background-color: transparent;
     text-decoration: none;
     color: #1f2430;
 
@@ -493,17 +496,19 @@ body.body--logo-background {
 
 .site-header__cart-btn {
     position: relative;
-    
+
 
 }
 
 .site-header__cart-btn.is-pulse {
     animation: cartPulse 0.5s ease;
 }
+
 .site-header__cart-btn i {
     transform: translateY(-2px);
-    font-size:1.8rem; 
+    font-size: 1.8rem;
 }
+
 .site-header__cart-count {
     position: absolute;
     top: -5px;
@@ -590,7 +595,7 @@ body.body--logo-background {
     }
 
     .header-logo {
-        height: 60px;
+
         transform: none;
     }
 
@@ -607,6 +612,15 @@ body.body--logo-background {
     .site-header__menu-toggle {
         width: 40px;
         height: 40px;
+    }
+
+    .site-header__wishlist-btn .bi-heart {
+        font-size: 1.30rem;
+    }
+
+    .site-header__menu-toggle .bi-list {
+        font-size: 1.75rem;
+        transform: translateY(1px);
     }
 
     .site-header__icon-btn i {
@@ -1029,7 +1043,7 @@ body.body--logo-background {
 .home-search-shell {
     width: min(860px, 90%);
     margin: 0 auto 2rem;
-    padding: 0.1rem 0 0;
+    padding: 2.5rem 2.5rem;
     display: grid;
     gap: 0.8rem;
 }
@@ -1960,7 +1974,7 @@ h2 {
 
 /* Correlati */
 .related-section {
-    margin-top: 2.2rem;
+    margin-top: 5.2rem;
 }
 
 .related-head p {
@@ -2126,7 +2140,7 @@ h2 {
 }
 
 .footer-logo {
-    height: 70px;
+    height: 150px;
     width: auto;
     display: block;
     margin-bottom: 0.9rem;
@@ -2409,7 +2423,7 @@ h2 {
     width: 82px;
     height: 82px;
     object-fit: contain;
-    background: #f6f5f2;
+    
     padding: 0.35rem;
     transition: transform 0.22s ease, opacity 0.22s ease;
 }
@@ -2721,7 +2735,7 @@ h2 {
     height: 98px;
     object-fit: contain;
     border-radius: 0.72rem;
-    background: #f4f5f7;
+
     padding: 0.4rem;
     transition: transform 0.22s ease, opacity 0.22s ease;
 }
@@ -3360,6 +3374,7 @@ h2 {
         pointer-events: none;
         transform: translateY(-10px);
         transition: max-height 0.28s ease, opacity 0.22s ease, transform 0.22s ease, padding 0.22s ease;
+        
     }
 
     .mobile-menu.is-open {
@@ -3368,6 +3383,9 @@ h2 {
         pointer-events: auto;
         transform: translateY(0);
         padding: 0.6rem 0 1rem;
+       
+        border-radius: 20px;
+       
     }
 
     .mobile-menu__link {
@@ -3748,4 +3766,35 @@ h2 {
 .wishlist-confirm-btn--danger {
     background: #d7192d;
     color: #fff;
+}
+
+.product-specs {
+  margin: 28px 0 8px;
+  border-top: 1px solid #e7e7e7;
+}
+
+.product-spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+ padding: 16px 8px 16px 0;
+  border-bottom: 1px solid #e7e7e7;
+}
+
+.spec-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+
+
+.spec-value {
+  font-size: 0.9rem;
+  color: #374151;
+  background: #f3f4f6;
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-align: right;
 }

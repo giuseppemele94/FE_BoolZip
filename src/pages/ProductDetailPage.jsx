@@ -244,7 +244,7 @@ function ProductDetailPage() {
                         onClick={() => toggleWishlist(product)}
                         aria-label={isWishlisted ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
                     >
-                        <i className={`bi ${isWishlisted ? "bi-heart-fill" : "bi-heart"}`}></i>
+                        <i className={`bi ${isWishlisted ? "bi-suit-heart-fill" : "bi-suit-heart"}`}></i>
                         <span>{isWishlisted ? "Salvato" : "Aggiungi ai preferiti"}</span>
                     </button>
 
