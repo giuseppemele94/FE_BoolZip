@@ -8,6 +8,7 @@ function MainHeader() {
     const [scrolled, setScrolled] = useState(false);
     const [flyItems, setFlyItems] = useState([]);
     const [isCartPulseActive, setIsCartPulseActive] = useState(false);
+     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const cartButtonRef = useRef(null);
 
     // Recupero dal context il numero totale di prodotti nel carrello.
@@ -78,6 +79,14 @@ function MainHeader() {
         toggleCartDrawer();
     };
 
+     const toggleMobileMenu = () => {
+        setIsMobileMenuOpen((prev) => !prev);
+    };
+
+    const closeMobileMenu = () => {
+        setIsMobileMenuOpen(false);
+    };
+
     return (
         // Aggiungo una classe dinamica se l'utente ha scrollato la pagina.
         <>
@@ -89,7 +98,7 @@ function MainHeader() {
                 <div className="site-header__inner">
 
                     {/* Logo del sito cliccabile che riporta alla homepage */}
-                    <Link to="/" className="site-header__brand">
+                    <Link to="/" className="site-header__brand" onClick={closeMobileMenu}>
                         <img
                             src="/images/logoBoolZip.png"
                             alt="BoolZip"
@@ -139,14 +148,30 @@ function MainHeader() {
                         </Link>
 
                         {/* Bottone hamburger per il menu mobile */}
-                        <button
+                         <button
                             type="button"
                             className="site-header__menu-toggle"
-                            aria-label="Apri menu"
+                            aria-label={isMobileMenuOpen ? "Chiudi menu" : "Apri menu"}
+                            aria-expanded={isMobileMenuOpen}
+                            onClick={toggleMobileMenu}
                         >
-                            <i className="bi bi-list"></i>
+                            <i className={`bi ${isMobileMenuOpen ? "bi-x-lg" : "bi-list"}`}></i>
                         </button>
                     </div>
+                </div>
+                <div className={`mobile-menu ${isMobileMenuOpen ? "is-open" : ""}`}>
+                    <NavLink to="/" className="mobile-menu__link" onClick={closeMobileMenu}>
+                        Home
+                    </NavLink>
+                    <NavLink to="/products" className="mobile-menu__link" onClick={closeMobileMenu}>
+                        Prodotti
+                    </NavLink>
+                    <NavLink to="/storia" className="mobile-menu__link" onClick={closeMobileMenu}>
+                        Storia
+                    </NavLink>
+                    <NavLink to="/login" className="mobile-menu__link" onClick={closeMobileMenu}>
+                        Login
+                    </NavLink>
                 </div>
             </header>
 
