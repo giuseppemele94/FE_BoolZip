@@ -368,6 +368,7 @@ body.body--logo-background {
     transition: background 0.25s ease, box-shadow 0.25s ease, backdrop-filter 0.25s ease;
 }
 
+
 .site-header--scrolled {
     background: rgba(255, 255, 255, 0.97);
     backdrop-filter: blur(10px);
@@ -448,7 +449,7 @@ body.body--logo-background {
 .site-header__menu-toggle {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    background-color:transparent;
     text-decoration: none;
     color: #1f2430;
 
@@ -470,8 +471,8 @@ body.body--logo-background {
 }
 
 .site-header__login i {
-    transform: translateY(2px);
-    font-size: 1.65rem;
+
+    font-size: 1.85rem;
     line-height: 1;
     display: flex;
     align-items: center;
@@ -492,14 +493,17 @@ body.body--logo-background {
 
 .site-header__cart-btn {
     position: relative;
-    background: #fff;
-   box-shadow: 0 4px 16px rgba(26, 27, 31, 0.12);
+    
+
 }
 
 .site-header__cart-btn.is-pulse {
     animation: cartPulse 0.5s ease;
 }
-
+.site-header__cart-btn i {
+    transform: translateY(-2px);
+    font-size:1.8rem; 
+}
 .site-header__cart-count {
     position: absolute;
     top: -5px;
@@ -3375,8 +3379,8 @@ h2 {
         font-weight: 700;
         padding: 0.95rem 1rem;
         border-radius: 0.8rem;
-        
-        
+
+
     }
 
     .mobile-menu__link.active {
@@ -3713,9 +3717,11 @@ h2 {
 
 .wishlist-confirm-modal h3 {
     margin-bottom: 0.5rem;
+    font-family: "Erica One", sans-serif;
 }
 
 .wishlist-confirm-modal p {
+    font-family: "Raleway", sans-serif;
     margin-bottom: 1rem;
     color: #5b6270;
 }
