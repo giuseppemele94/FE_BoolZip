@@ -47,8 +47,8 @@ function ProductList({
     }, [products, limit]);
 
     const categoryOptions = [
-        { value: "Accendini", label: "Accendini" },
-        { value: "Accessori", label: "Accessori" },
+        { value: "Classic", label: "Classici" },
+        { value: "Electric", label: "Elettrici" },
     ];
 
     const materialOptions = [
