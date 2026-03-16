@@ -62,6 +62,14 @@ function ProductsPage() {
         setSearchParams(nextSearchParams, { replace: true });
     }
 
+    function handlePriceRangeChange(nextMin, nextMax) {
+    setMinPrice(nextMin);
+    setMaxPrice(nextMax);
+    updateUrlParams({
+        nextMinPrice: nextMin,
+        nextMaxPrice: nextMax,
+    });
+}
     function handleSearchChange(value) {
         setSearchTerm(value);
         updateUrlParams({ nextSearch: value });
