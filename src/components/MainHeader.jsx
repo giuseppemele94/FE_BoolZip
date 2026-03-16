@@ -132,7 +132,7 @@ function MainHeader() {
                             className={`site-header__icon-btn site-header__cart-btn ${isCartPulseActive ? "is-pulse" : ""}`}
                             aria-label="Carrello"
                         >
-                            <i className="bi bi-cart4"></i>
+                            <i className="bi bi-cart2"></i>
 
                             {/* Mostro il badge solo se nel carrello c'è almeno un prodotto */}
                             {cartCount > 0 && (
@@ -147,7 +147,7 @@ function MainHeader() {
                             className="site-header__icon-btn site-header__wishlist-btn"
                             aria-label="Preferiti"
                         >
-                            <i className="bi bi-heart"></i>
+                            <i className="bi bi-suit-heart"></i>
 
                             {wishlistCount > 0 && (
                                 <span className="site-header__cart-count">{wishlistCount}</span>

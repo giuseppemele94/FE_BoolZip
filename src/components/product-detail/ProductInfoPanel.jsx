@@ -88,37 +88,29 @@ function ProductInfoPanel({
             {/* Contenuti editoriali */}
             <p className="product-description">{product.description}</p>
 
-            {productMaterials.length > 0 && (
-                <>
-                    <p className="product-tax-note">Materiali</p>
-                    <ul className="product-features">
-                        {productMaterials.map((material) => (
-                            <li key={material}>{material}</li>
-                        ))}
-                    </ul>
-                </>
-            )}
+            {(productMaterials.length > 0 || productSizes.length > 0 || productCategories.length > 0) && (
+                <div className="product-specs">
+                    {productMaterials.length > 0 && (
+                        <div className="product-spec-row">
+                            <span className="spec-label">Materiale</span>
+                            <span className="spec-value">{productMaterials.join(", ")}</span>
+                        </div>
+                    )}
 
-            {productSizes.length > 0 && (
-                <>
-                    <p className="product-tax-note">Dimensione</p>
-                    <ul className="product-features">
-                        {productSizes.map((size) => (
-                            <li key={size}>{size}</li>
-                        ))}
-                    </ul>
-                </>
-            )}
+                    {productSizes.length > 0 && (
+                        <div className="product-spec-row">
+                            <span className="spec-label">Dimensione</span>
+                            <span className="spec-value">{productSizes.join(", ")}</span>
+                        </div>
+                    )}
 
-            {productCategories.length > 0 && (
-                <>
-                    <p className="product-tax-note">Categoria</p>
-                    <ul className="product-features">
-                        {productCategories.map((category) => (
-                            <li key={category}>{category}</li>
-                        ))}
-                    </ul>
-                </>
+                    {productCategories.length > 0 && (
+                        <div className="product-spec-row">
+                            <span className="spec-label">Categoria</span>
+                            <span className="spec-value">{productCategories.join(", ")}</span>
+                        </div>
+                    )}
+                </div>
             )}
 
             <ul className="product-features">
