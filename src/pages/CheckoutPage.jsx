@@ -14,7 +14,14 @@ function CheckoutPage() {
     // - i prodotti nel carrello
     // - il totale base del carrello
     // - la funzione per svuotarlo dopo ordine concluso
-    const { cartItems, cartTotal, clearCart } = useCart();
+    const {
+        cartItems,
+        cartTotal,
+        clearCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+    } = useCart();
 
     // Stato del form checkout:
     // contiene i dati cliente e l'eventuale codice sconto inserito
@@ -108,7 +115,22 @@ function CheckoutPage() {
             [name]: value,
         }));
     }
+    function handleIncreaseItem(productId) {
+        increaseQuantity(productId);
+    }
 
+    function handleDecreaseItem(productId, currentQuantity) {
+        if (currentQuantity <= 1) {
+            removeFromCart(productId);
+            return;
+        }
+
+        decreaseQuantity(productId);
+    }
+
+    function handleRemoveItem(productId) {
+        removeFromCart(productId);
+    }
     /*
       Invio del checkout:
       - raccoglie i dati del cliente
@@ -469,9 +491,43 @@ function CheckoutPage() {
                                     </div>
 
                                     <div className="checkout-summary__item-info">
-                                        <h3>{item.name}</h3>
-                                        <p>Quantità: {item.quantity}</p>
+                                        <div className="checkout-summary__item-top">
+                                            <h3>{item.name}</h3>
+
+                                            <button
+                                                type="button"
+                                                className="checkout-summary__remove"
+                                                onClick={() => handleRemoveItem(item.product_id)}
+                                                aria-label={`Rimuovi ${item.name} dal carrello`}
+                                            >
+                                                Rimuovi
+                                            </button>
+                                        </div>
+
                                         <p>Prezzo: € {Number(item.price).toFixed(2)}</p>
+
+                                        <div className="checkout-summary__quantity-controls">
+                                            <button
+                                                type="button"
+                                                className="checkout-summary__qty-btn"
+                                                onClick={() => handleDecreaseItem(item.product_id, item.quantity)}
+                                                aria-label={`Diminuisci quantità di ${item.name}`}
+                                            >
+                                                -
+                                            </button>
+
+                                            <span className="checkout-summary__qty-value">{item.quantity}</span>
+
+                                            <button
+                                                type="button"
+                                                className="checkout-summary__qty-btn"
+                                                onClick={() => handleIncreaseItem(item.product_id)}
+                                                aria-label={`Aumenta quantità di ${item.name}`}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+
                                         <p>
                                             Subtotale: €{" "}
                                             {(Number(item.price) * Number(item.quantity)).toFixed(2)}
