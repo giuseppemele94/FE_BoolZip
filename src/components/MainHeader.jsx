@@ -116,9 +116,7 @@ function MainHeader() {
                         <NavLink to="/products" className="site-header__link">
                             Prodotti
                         </NavLink>
-                        <NavLink to="/storia" className="site-header__link">
-                            Storia
-                        </NavLink>
+                        
                     </nav>
 
                     {/* Area azioni a destra: carrello, login, menu mobile */}
