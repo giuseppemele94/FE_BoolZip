@@ -56,6 +56,9 @@ function CheckoutPage() {
     // Messaggio di successo mostrato dopo il checkout completato
     const [successMessage, setSuccessMessage] = useState("");
 
+    //use state per la checkbox indirizzo di fatturazione=spedizione
+    const [sameBillingAddress, setSameBillingAddress] = useState(true);
+
     // Verifico se il carrello è vuoto
     const isCartEmpty = cartItems.length === 0;
 
@@ -110,10 +113,18 @@ function CheckoutPage() {
             setAppliedDiscount(0);
         }
 
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setFormData((prev) => {
+            const updatedData = {
+                ...prev,
+                [name]: value,
+            };
+
+            if (name === "customer_address" && sameBillingAddress) {
+                updatedData.customer_billing_address = value;
+            }
+
+            return updatedData;
+        });
     }
     function handleIncreaseItem(productId) {
         increaseQuantity(productId);
@@ -130,6 +141,18 @@ function CheckoutPage() {
 
     function handleRemoveItem(productId) {
         removeFromCart(productId);
+    }
+
+    function handleSameBillingAddressChange(e) {
+        const isChecked = e.target.checked;
+        setSameBillingAddress(isChecked);
+
+        setFormData((prev) => ({
+            ...prev,
+            customer_billing_address: isChecked
+                ? prev.customer_address
+                : "",
+        }));
     }
     /*
       Invio del checkout:
@@ -166,7 +189,9 @@ function CheckoutPage() {
                 customer_phone: formData.customer_phone,
                 customer_email: formData.customer_email,
                 customer_address: formData.customer_address,
-                customer_billing_address: formData.customer_billing_address,
+                customer_billing_address: sameBillingAddress
+                    ? formData.customer_address
+                    : formData.customer_billing_address,
 
                 // Trasformo i prodotti del carrello nel formato atteso dal backend
                 products: cartItems.map((item) => ({
@@ -365,6 +390,8 @@ function CheckoutPage() {
                             />
                         </div>
 
+
+
                         <div className="checkout-form__field checkout-form__field--full">
                             <label htmlFor="customer_address">Indirizzo di spedizione</label>
                             <input
@@ -378,18 +405,32 @@ function CheckoutPage() {
                         </div>
 
                         <div className="checkout-form__field checkout-form__field--full">
-                            <label htmlFor="customer_billing_address">
-                                Indirizzo di fatturazione
+                            <label className="checkout-form__checkbox" htmlFor="same_billing_address">
+                                <input
+                                    id="same_billing_address"
+                                    type="checkbox"
+                                    checked={sameBillingAddress}
+                                    onChange={handleSameBillingAddressChange}
+                                />
+                                <span>L’indirizzo di fatturazione coincide con quello di spedizione</span>
                             </label>
-                            <input
-                                id="customer_billing_address"
-                                type="text"
-                                name="customer_billing_address"
-                                value={formData.customer_billing_address}
-                                onChange={handleChange}
-                                required
-                            />
                         </div>
+
+                        {!sameBillingAddress && (
+                            <div className="checkout-form__field checkout-form__field--full">
+                                <label htmlFor="customer_billing_address">
+                                    Indirizzo di fatturazione
+                                </label>
+                                <input
+                                    id="customer_billing_address"
+                                    type="text"
+                                    name="customer_billing_address"
+                                    value={formData.customer_billing_address}
+                                    onChange={handleChange}
+                                    required={!sameBillingAddress}
+                                />
+                            </div>
+                        )}
 
                         {/* Campo coupon opzionale */}
                         <div className="checkout-form__field checkout-form__field--full">
