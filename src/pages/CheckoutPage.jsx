@@ -30,8 +30,15 @@ function CheckoutPage() {
         customer_lastname: "",
         customer_phone: "",
         customer_email: "",
-        customer_address: "",
-        customer_billing_address: "",
+
+        shipping_street: "",
+        shipping_zip: "",
+        shipping_city: "",
+
+        billing_street: "",
+        billing_zip: "",
+        billing_city: "",
+
         discount_code: "",
     });
 
@@ -103,6 +110,14 @@ function CheckoutPage() {
         return (Number(discountedTotal) + shippingCost).toFixed(2);
     }, [discountedTotal, shippingCost]);
 
+    //funzione per comporre la stringa dell'indirizzo completo a partire dai singoli campi street, zip e city
+    function buildFullAddress(street, zip, city) {
+        return [street, zip, city]
+            .map((value) => String(value || "").trim())
+            .filter(Boolean)
+            .join(", ");
+    }
+
     // Funzione generica per aggiornare i campi del form
     function handleChange(e) {
         const { name, value } = e.target;
@@ -119,13 +134,25 @@ function CheckoutPage() {
                 [name]: value,
             };
 
-            if (name === "customer_address" && sameBillingAddress) {
-                updatedData.customer_billing_address = value;
+            if (sameBillingAddress) {
+                if (name === "shipping_street") {
+                    updatedData.billing_street = value;
+                }
+
+                if (name === "shipping_zip") {
+                    updatedData.billing_zip = value;
+                }
+
+                if (name === "shipping_city") {
+                    updatedData.billing_city = value;
+                }
             }
 
             return updatedData;
         });
     }
+
+
     function handleIncreaseItem(productId) {
         increaseQuantity(productId);
     }
@@ -143,15 +170,16 @@ function CheckoutPage() {
         removeFromCart(productId);
     }
 
+    // Funzione per gestire il cambio dello stato della checkbox "stesso indirizzo di fatturazione"
     function handleSameBillingAddressChange(e) {
         const isChecked = e.target.checked;
         setSameBillingAddress(isChecked);
 
         setFormData((prev) => ({
             ...prev,
-            customer_billing_address: isChecked
-                ? prev.customer_address
-                : "",
+            billing_street: isChecked ? prev.shipping_street : "",
+            billing_zip: isChecked ? prev.shipping_zip : "",
+            billing_city: isChecked ? prev.shipping_city : "",
         }));
     }
     /*
@@ -163,6 +191,21 @@ function CheckoutPage() {
       - mostra il messaggio finale di conferma
     */
     async function handleSubmit(e) {
+
+        // Costruisco le stringhe degli indirizzi completi da mandare al backend, a partire dai singoli campi
+        const fullShippingAddress = buildFullAddress(
+            formData.shipping_street,
+            formData.shipping_zip,
+            formData.shipping_city
+        );
+
+        const fullBillingAddress = sameBillingAddress
+            ? fullShippingAddress
+            : buildFullAddress(
+                formData.billing_street,
+                formData.billing_zip,
+                formData.billing_city
+            );
         e.preventDefault();
 
         // Blocco di sicurezza: se il carrello è vuoto non procedo
@@ -188,10 +231,8 @@ function CheckoutPage() {
                 customer_lastname: formData.customer_lastname,
                 customer_phone: formData.customer_phone,
                 customer_email: formData.customer_email,
-                customer_address: formData.customer_address,
-                customer_billing_address: sameBillingAddress
-                    ? formData.customer_address
-                    : formData.customer_billing_address,
+                customer_address: fullShippingAddress,
+                customer_billing_address: fullBillingAddress,
 
                 // Trasformo i prodotti del carrello nel formato atteso dal backend
                 products: cartItems.map((item) => ({
@@ -393,16 +434,46 @@ function CheckoutPage() {
 
 
                         <div className="checkout-form__field checkout-form__field--full">
-                            <label htmlFor="customer_address">Indirizzo di spedizione</label>
+                            <h3 className="checkout-form__section-title">Indirizzo di spedizione</h3>
+
+                            <label htmlFor="shipping_street"></label>
                             <input
-                                id="customer_address"
+                                id="shipping_street"
                                 type="text"
-                                name="customer_address"
-                                value={formData.customer_address}
+                                name="shipping_street"
+                                value={formData.shipping_street}
                                 onChange={handleChange}
                                 required
+                                placeholder="Via e numero civico"
                             />
                         </div>
+
+                        <div className="checkout-form__field">
+                            <label htmlFor="shipping_zip"></label>
+                            <input
+                                id="shipping_zip"
+                                type="text"
+                                name="shipping_zip"
+                                value={formData.shipping_zip}
+                                onChange={handleChange}
+                                required
+                                placeholder="CAP"
+                            />
+                        </div>
+
+                        <div className="checkout-form__field">
+                            <label htmlFor="shipping_city"></label>
+                            <input
+                                id="shipping_city"
+                                type="text"
+                                name="shipping_city"
+                                value={formData.shipping_city}
+                                onChange={handleChange}
+                                required
+                                placeholder="Città"
+                            />
+                        </div>
+
 
                         <div className="checkout-form__field checkout-form__field--full">
                             <label className="checkout-form__checkbox" htmlFor="same_billing_address">
@@ -416,20 +487,50 @@ function CheckoutPage() {
                             </label>
                         </div>
 
+                        {/*Se la checkbox "stesso indirizzo di fatturazione" è deselezionata, mostro i campi per l'indirizzo di fatturazione*/}
                         {!sameBillingAddress && (
-                            <div className="checkout-form__field checkout-form__field--full">
-                                <label htmlFor="customer_billing_address">
-                                    Indirizzo di fatturazione
-                                </label>
-                                <input
-                                    id="customer_billing_address"
-                                    type="text"
-                                    name="customer_billing_address"
-                                    value={formData.customer_billing_address}
-                                    onChange={handleChange}
-                                    required={!sameBillingAddress}
-                                />
-                            </div>
+                            <>
+                                <div className="checkout-form__field checkout-form__field--full">
+                                    <h3 className="checkout-form__section-title">Indirizzo di fatturazione</h3>
+
+                                    <label htmlFor="billing_street"></label>
+                                    <input
+                                        id="billing_street"
+                                        type="text"
+                                        name="billing_street"
+                                        value={formData.billing_street}
+                                        onChange={handleChange}
+                                        required={!sameBillingAddress}
+                                        placeholder="Via e numero civico"
+                                    />
+                                </div>
+
+                                <div className="checkout-form__field">
+                                    <label htmlFor="billing_zip"> </label>
+                                    <input
+                                        id="billing_zip"
+                                        type="text"
+                                        name="billing_zip"
+                                        value={formData.billing_zip}
+                                        onChange={handleChange}
+                                        required={!sameBillingAddress}
+                                        placeholder="CAP"
+                                    />
+                                </div>
+
+                                <div className="checkout-form__field">
+                                    <label htmlFor="billing_city"></label>
+                                    <input
+                                        id="billing_city"
+                                        type="text"
+                                        name="billing_city"
+                                        value={formData.billing_city}
+                                        onChange={handleChange}
+                                        required={!sameBillingAddress}
+                                        placeholder="Città"
+                                    />
+                                </div>
+                            </>
                         )}
 
                         {/* Campo coupon opzionale */}
