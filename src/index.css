@@ -3850,3 +3850,10 @@ h2 {
     text-align: center;
     font-weight: 600;
 }
+
+.checkout-form__section-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin: 18px 0 10px;
+    line-height: 1.2;
+}
