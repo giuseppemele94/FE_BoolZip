@@ -209,7 +209,7 @@ function ProductList({
                             inputId="products-catalog-search"
                             eyebrow="Ricerca rapida"
                             title="Cerca nel catalogo"
-                            placeholder="Cerca per nome, stile o finitura"
+                            placeholder="Cerca per nome"
                         />
 
                         {searchTerm.trim() !== "" && (

@@ -97,9 +97,9 @@ function NewsletterPopup() {
                     <button
                         type="submit"
                         className="newsletter-popup__button"
-                        disabled={loading}
+                        disabled={loading || isSuccess}
                     >
-                        {loading ? "Invio..." : "Iscriviti"}
+                        {loading ? "Invio..." : isSuccess ? "Iscritto" : "Iscriviti"}
                     </button>
                 </form>
 

@@ -30,13 +30,13 @@ function HomePage({ products }) {
                     totalCount={Array.isArray(products) ? products.length : 0}
                     visibleCount={Array.isArray(products) ? products.length : 0}
                     onSubmit={handleSearchSubmit}
-                    submitLabel="Apri"
+                    submitLabel="Cerca"
                     variant="compact"
                     showStats={false}
                     inputId="home-catalog-search"
                     eyebrow="Ricerca rapida"
                     title="Trova il tuo Zippo"
-                    placeholder="Cerca per nome, stile o finitura"
+                    placeholder="Cerca per nome"
                 />
             </section>
             <LatestArrivalsSection products={products} limit={3} />
