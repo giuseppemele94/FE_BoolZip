@@ -42,7 +42,7 @@ git clone <URL_REPOSITORY>
 Entrare nella directory del progetto:
 
 ```bash
-cd fe-boolzip
+cd FE-BoolZip
 ```
 
 
@@ -61,7 +61,7 @@ npm run dev
 ```
 
 Il progetto sarà disponibile su:
-[Avvia l'app in locale](http://localhost:5173)
+[http://localhost:5173](http://localhost:5173)
 
 ---
 
@@ -103,7 +103,7 @@ src/
 
 ## 👤 Autori
 
-- Salvatore Scalise
-- Giuseppe Mele
-- Paolo Mucedero
-- Luca Fiore
+- Salvatore Scalise ([GitHub](https://github.com/salvatorescalise1999))
+- Giuseppe Mele ([GitHub](https://github.com/giuseppemele94))
+- Paolo Mucedero ([GitHub](https://github.com/PaoloMucedero))
+- Luca Fiore ([GitHub](https://github.com/LucaFiore01))
