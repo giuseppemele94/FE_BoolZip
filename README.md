@@ -1,16 +1,109 @@
-# React + Vite
+# FE-BoolZip
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Applicazione frontend sviluppata con React e Vite.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📌 Descrizione
 
-## React Compiler
+Questo progetto è una web application frontend costruita con React e Vite.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L’applicazione è strutturata in modo modulare e include:
+- Navigazione tra pagine tramite React Router
+- Gestione dello stato globale tramite Context API
+- Componenti riutilizzabili
+- Layout dedicati per organizzare le viste
+- Integrazione con API tramite Axios
+- Styling con Bootstrap
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Tecnologie utilizzate
+
+- React
+- Vite
+- React Router DOM
+- Axios
+- Bootstrap 5
+- Bootstrap Icons
+- CSS
+
+---
+
+## ⚙️ Installazione
+
+Clonare il repository:
+
+```bash
+git clone <URL_REPOSITORY>
+```
+
+
+Entrare nella directory del progetto:
+
+```bash
+cd fe-boolzip
+```
+
+
+Installare le dipendenze:
+```bash
+npm install
+```
+---
+
+## ▶️ Avvio in modalità sviluppo
+
+Avviare il server locale:
+
+```bash
+npm run dev
+```
+
+Il progetto sarà disponibile su:
+[Avvia l'app in locale](http://localhost:5173)
+
+---
+
+## 🧱 Struttura del progetto
+
+La cartella `src` è organizzata nel seguente modo:
+
+```bash
+src/
+ ├── components/   # Componenti riutilizzabili dell'interfaccia
+ ├── pages/        # Pagine dell'applicazione (views principali)
+ ├── contexts/     # Context API per gestione stato globale
+ ├── data/         # Dati statici o mock
+ ├── layouts/      # Layout dell'app (strutture comuni delle pagine)
+ ├── App.jsx       # Componente principale dell'app
+ ├── main.jsx      # Entry point dell'applicazione
+ └── index.css     # Stili globali
+ ```
+
+ ---
+
+ ## 📦 Dipendenze principali
+
+- React
+- React Router DOM
+- Axios
+- Bootstrap
+
+---
+
+## 📌 Note
+
+- È necessario avere Node.js installato (versione LTS consigliata)
+- Il progetto utilizza Vite come bundler
+- La porta di default è 5173
+- Assicurarsi di aver installato correttamente tutte le dipendenze prima di avviare il progetto
+
+---
+
+## 👤 Autori
+
+- Salvatore Scalise
+- Giuseppe Mele
+- Paolo Mucedero
+- Luca Fiore
